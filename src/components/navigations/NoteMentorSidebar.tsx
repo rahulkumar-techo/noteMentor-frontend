@@ -69,9 +69,9 @@ export function NoteMentorSidebar() {
             {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </Button>
           {open && (
-            <h1 className="text-xl font-bold text-[#FFD700] tracking-wide">
+            <Link href={"/"} className="text-xl font-bold text-[#FFD700] tracking-wide">
               NoteMentor
-            </h1>
+            </Link>
           )}
         </div>
         {open && <Bell className="w-5 h-5 text-[#FFD700]" />}
