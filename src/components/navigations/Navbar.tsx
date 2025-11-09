@@ -5,19 +5,37 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, User } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useGetUserQuery } from "@/feature/user/userApi";
+import ProfileDropdown from "../ProfileDropDown";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isClient, setIsClient] = useState(false);
-  const path = usePathname();
+  const [hydrated, setHydrated] = useState(false);
+  const pathname = usePathname();
 
-  // 🧠 Detect when hydration is done
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  // ✅ Fetch user data once (no spam calls)
+  const { data, isLoading, isError } = useGetUserQuery(undefined, {
+    refetchOnMountOrArgChange: false,
+    refetchOnFocus: false,
+    refetchOnReconnect: false,
+  });
 
-  // 🚫 Hide navbar on /dashboard and its subpages
-  if (path.startsWith("/dashboard")) return null;
+  // 🧠 Safe parsing (works with any backend structure)
+  const user =
+    data?.data || // case: { data: {...user} }
+    data?.user || // case: { user: {...user} }
+    data ||       // case: {...user}
+    null;
+
+  useEffect(() => setHydrated(true), []);
+
+  // 🧱 Skip navbar on dashboard, login, signup
+  if (
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/signup")
+  )
+    return null;
 
   const navItems = [
     { name: "Home", href: "/" },
@@ -26,8 +44,7 @@ const Navbar = () => {
     { name: "Dashboard", href: "/dashboard" },
   ];
 
-  // 🧩 Render a static navbar on the server, animated only on client
-  if (!isClient) {
+  if (!hydrated) {
     return (
       <nav
         className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[92%] sm:w-[90%] md:w-[85%]
@@ -49,29 +66,31 @@ const Navbar = () => {
     <motion.nav
       initial={{ opacity: 0, y: -15 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
       className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[92%] sm:w-[90%] md:w-[85%]
       backdrop-blur-lg bg-white/40 dark:bg-white/10 
       border border-white/30 dark:border-white/10
       rounded-2xl px-4 sm:px-6 py-3 shadow-xl flex items-center justify-between"
     >
-      {/* 🚀 Left - Logo */}
-      <div className="flex items-center gap-2">
-        <Link
-          href="/"
-          className="font-semibold text-gray-800 dark:text-gray-100 text-sm sm:text-base"
-        >
-          NoteMentor
-        </Link>
-      </div>
+      {/* 🚀 Logo */}
+      <Link
+        href="/"
+        className="font-semibold text-gray-800 dark:text-gray-100 text-sm sm:text-base"
+      >
+        NoteMentor
+      </Link>
 
-      {/* 📑 Center - Nav Links (Desktop) */}
+      {/* 📑 Nav Links (Desktop) */}
       <div className="hidden md:flex items-center justify-center space-x-8">
         {navItems.map((item) => (
           <Link
             key={item.name}
             href={item.href}
-            className="text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-500 dark:hover:text-teal-400 transition-colors"
+            className={`text-sm font-medium transition-colors ${
+              pathname === item.href
+                ? "text-indigo-500 dark:text-teal-400"
+                : "text-gray-700 dark:text-gray-200 hover:text-indigo-500 dark:hover:text-teal-400"
+            }`}
           >
             {item.name}
           </Link>
@@ -80,20 +99,33 @@ const Navbar = () => {
 
       {/* 📱 Mobile Menu Toggle */}
       <button
-        onClick={() => setMenuOpen(!menuOpen)}
+        onClick={() => setMenuOpen((prev) => !prev)}
         className="md:hidden text-gray-700 dark:text-gray-200 hover:text-indigo-500 dark:hover:text-teal-400 transition-colors"
       >
         {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
       </button>
 
-      {/* 🧍 Right - Avatar */}
-      <div className="hidden md:flex items-center gap-2 cursor-pointer">
-        <div className="flex items-center justify-center w-9 h-9 rounded-full bg-linear-to-tr from-indigo-500 to-teal-400 text-white font-semibold">
-          R
-        </div>
-        <span className="text-sm text-gray-700 dark:text-gray-200 font-medium">
-          Profile
-        </span>
+      {/* 🧍 User Section (Desktop) */}
+      <div className="hidden md:flex items-center gap-2">
+        {isLoading ? (
+          <div className="w-9 h-9 rounded-full bg-gray-300 dark:bg-gray-700 animate-pulse" />
+        ) : isError || !user ? (
+          <Link
+            href="/login"
+            className="text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-500 dark:hover:text-teal-400 transition-colors"
+          >
+            Login
+          </Link>
+        ) : (
+          <ProfileDropdown
+            user={{
+              name: user.fullname || user.name || "User",
+              email: user.email,
+              image: user.avatar?.secure_url || user.image || undefined,
+            }}
+            onSignOut={() => console.log("Logging out...")}
+          />
+        )}
       </div>
 
       {/* 📱 Mobile Dropdown */}
@@ -118,11 +150,24 @@ const Navbar = () => {
                 {item.name}
               </Link>
             ))}
+
             <div className="mt-3 border-t border-white/20 w-full pt-3 flex justify-center">
-              <div className="flex items-center gap-2 text-gray-300">
-                <User className="w-5 h-5" />
-                <span>Profile</span>
-              </div>
+              {isLoading ? (
+                <span className="text-gray-300 text-sm">Loading...</span>
+              ) : isError || !user ? (
+                <Link
+                  href="/login"
+                  onClick={() => setMenuOpen(false)}
+                  className="text-gray-300 hover:text-indigo-400 text-sm"
+                >
+                  Login
+                </Link>
+              ) : (
+                <div className="flex items-center gap-2 text-gray-300">
+                  <User className="w-5 h-5" />
+                  <span>{user.fullname || user.name}</span>
+                </div>
+              )}
             </div>
           </motion.div>
         )}

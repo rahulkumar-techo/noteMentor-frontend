@@ -1,10 +1,18 @@
-import { configureStore } from '@reduxjs/toolkit'
+
+import { configureStore } from "@reduxjs/toolkit";
+import api from "@/feature/mainApi";
 
 export const store = configureStore({
-  reducer: {},
-})
+  reducer: {
 
-// Infer the `RootState` and `AppDispatch` types from the store itself
-export type RootState = ReturnType<typeof store.getState>
-// Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
-export type AppDispatch = typeof store.dispatch
+    [api.reducerPath]: api.reducer,
+  },
+
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(api.middleware), 
+  devTools: process.env.NODE_ENV !== "production",
+});
+
+//  Typed hooks support
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;

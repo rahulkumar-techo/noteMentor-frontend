@@ -1,13 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { NoteMentorSidebar } from "@/components/navigations/NoteMentorSidebar";
 import { ThemeProvider } from "@/components/settings/theme-provider";
-import NoteMentorAnimatedBackground from "@/components/heroAnimatedBg";
-import Navbar from "@/components/navigations/Navbar";
-import { Provider } from 'react-redux'
-import { store } from "./store";
+import ClientProvider from "@/components/provider/ClientProvider";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,21 +28,20 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white`}
       >
-        <Provider store={store} >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ClientProvider>
             <div className="flex h-screen w-full">
-              <main className="relative flex-1 f h-screen overflow-y-auto w-full text-white ">
-                <Navbar />
+              <main className="relative flex-1 h-screen overflow-y-auto w-full text-white">
                 {children}
               </main>
             </div>
-          </ThemeProvider>
-        </Provider>
+          </ClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

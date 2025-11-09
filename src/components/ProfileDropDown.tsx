@@ -1,64 +1,113 @@
+"use client";
+
 /**
  * ProfileDropdown.tsx
  *
  * Description:
- * A reusable Profile dropdown component built with shadcn/ui primitives and Tailwind CSS.
- * - Default export is a React component.
- * - Accepts an optional `user` prop to show avatar, name, and email.
- * - Includes actions: View Profile, Settings, Billing, and Sign out.
- * - Accessibility-friendly and responsive.
- *
- * Usage:
- * <ProfileDropdown user={{ name: 'Rahul Kumar', email: 'rahul@example.com', image: '/me.jpg' }} onSignOut={handleSignOut} />
+ * - Custom profile dropdown (no shadcn Avatar dependency).
+ * - Automatically handles Google/Cloudinary/local images.
+ * - Includes fallback with initials if image fails.
+ * - Accessible, responsive, and visually clean.
  */
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuLabel,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
-
-type Props = {
-  user?: {
-    name?: string;
-    email?: string;
-    image?: string;
-  };
-  onSignOut?: () => void;
+type UserInfo = {
+  name?: string;
+  email?: string;
+  image?: string;
+  avatar?: { secure_url?: string };
 };
 
-export default function ProfileDropdown({ user, onSignOut }: Props) {
+interface ProfileDropdownProps {
+  user?: UserInfo;
+  onSignOut?: () => void;
+}
+
+export default function ProfileDropdown({ user, onSignOut }: ProfileDropdownProps) {
+  const [imageError, setImageError] = useState(false);
+
+  // 🧠 Determine safe image source
+  const imageSrc =
+    !imageError && (user?.image || user?.avatar?.secure_url)
+      ? user?.image || user?.avatar?.secure_url
+      : null;
+
+      console.log(imageSrc)
+
+  // 🧩 Generate initials from name
+  const initials =
+    user?.name
+      ?.split(" ")
+      .map((word) => word[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() || "U";
+
+  // 🎨 Random background color (for fallback)
+  const fallbackColors = [
+    "bg-gradient-to-tr from-indigo-500 to-teal-400",
+    "bg-gradient-to-tr from-pink-500 to-orange-400",
+    "bg-gradient-to-tr from-purple-500 to-blue-400",
+  ];
+  const color = fallbackColors[initials.charCodeAt(0) % fallbackColors.length];
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="rounded-full p-0">
-          <Avatar className="h-9 w-9">
-            {user?.image ? (
-              <AvatarImage src={user.image} alt={user.name ?? "avatar"} />
+        <Button
+          variant="ghost"
+          className="rounded-full p-0 focus-visible:ring-2 focus-visible:ring-indigo-400 transition-all"
+        >
+          {/* ✅ Custom Avatar */}
+          <div
+            className="relative flex items-center justify-center h-9 w-9 rounded-full overflow-hidden border border-white/10 shadow-sm"
+          >
+            {imageSrc && !imageError ? (
+              <Image
+                src={imageSrc}
+                alt={user?.name || "User avatar"}
+                onError={() => setImageError(true)}
+                className="object-cover w-full h-full transition-opacity duration-200"
+                width={20}
+                height={20}
+              />
             ) : (
-              <AvatarFallback>{(user?.name ?? "U").slice(0, 2)}</AvatarFallback>
+              <div
+                className={`flex items-center justify-center w-full h-full text-white text-sm font-semibold ${color}`}
+              >
+                {initials}
+              </div>
             )}
-          </Avatar>
+          </div>
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" className="w-56">
-        <div className="px-4 py-3">
-          <p className="text-sm font-medium">{user?.name ?? "Guest"}</p>
-          {user?.email && <p className="text-xs text-muted-foreground truncate">{user.email}</p>}
+      <DropdownMenuContent
+        align="end"
+        sideOffset={8}
+        className="w-56 rounded-xl border border-white/10 bg-popover backdrop-blur-md shadow-lg"
+      >
+        {/* 🧑 User Info */}
+        <div className="px-4 py-3 border-b border-white/10">
+          <p className="text-sm font-medium truncate">{user?.name || "Guest"}</p>
+          {user?.email && (
+            <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+          )}
         </div>
 
-        <DropdownMenuSeparator />
-
+        {/* 🔗 Menu Links */}
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
             <Link href="/me">Profile</Link>
@@ -73,14 +122,15 @@ export default function ProfileDropdown({ user, onSignOut }: Props) {
           </DropdownMenuItem>
         </DropdownMenuGroup>
 
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className="my-1 border-white/10" />
 
+        {/* 🚪 Sign Out */}
         <DropdownMenuItem
-          className="cursor-pointer"
           onSelect={(e) => {
             e.preventDefault();
             onSignOut?.();
           }}
+          className="text-red-500 focus:text-red-600 font-medium cursor-pointer"
         >
           Sign out
         </DropdownMenuItem>
