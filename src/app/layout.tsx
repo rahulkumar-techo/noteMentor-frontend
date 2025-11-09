@@ -6,6 +6,8 @@ import { NoteMentorSidebar } from "@/components/navigations/NoteMentorSidebar";
 import { ThemeProvider } from "@/components/settings/theme-provider";
 import NoteMentorAnimatedBackground from "@/components/heroAnimatedBg";
 import Navbar from "@/components/Navbar";
+import { Provider } from 'react-redux'
+import { store } from "./store";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +32,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white`}
       >
-      
+        <Provider store={store} >
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -39,12 +41,12 @@ export default function RootLayout({
           >
             <div className="flex h-screen w-full">
               <main className="relative flex-1 f h-screen overflow-y-auto w-full text-white ">
-                <Navbar/>
+                <Navbar />
                 {children}
               </main>
             </div>
           </ThemeProvider>
-       
+        </Provider>
       </body>
     </html>
   );
