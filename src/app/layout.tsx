@@ -5,7 +5,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { NoteMentorSidebar } from "@/components/navigations/NoteMentorSidebar";
 import { ThemeProvider } from "@/components/settings/theme-provider";
 import NoteMentorAnimatedBackground from "@/components/heroAnimatedBg";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/navigations/Navbar";
 import { Provider } from 'react-redux'
 import { store } from "./store";
 
