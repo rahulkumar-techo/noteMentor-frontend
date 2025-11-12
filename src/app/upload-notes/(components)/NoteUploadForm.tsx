@@ -1,5 +1,14 @@
 "use client";
 
+/**
+ * Note Upload Form (Separated Inputs for Images & PDFs)
+ * -----------------------------------------------------------
+ * - Thumbnail upload (single image)
+ * - Images upload (up to 10)
+ * - PDFs upload (up to 2)
+ * - Clean state and Zod validation
+ */
+
 import { useRef, useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -17,14 +26,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { UploadCloud, FileImage, FileText, Trash2, AlertCircle, Loader2 } from "lucide-react";
-import { Spinner } from "../../../components/ui/spinner";
-import { Progress } from "../../../components/ui/progress";
+import { Progress } from "@/components/ui/progress";
 
+
+// ⛔ UPDATED SCHEMA → images & pdfs are separate
 const noteSchema = z.object({
   title: z.string().min(1, "Title is required"),
   descriptions: z.string().optional(),
+
   thumbnail: z.instanceof(File).optional().nullable(),
-  files: z.array(z.instanceof(File)).min(1, "Please upload note files"),
+
+  images: z.array(z.instanceof(File)).max(10, "Max 10 images allowed"),
+  pdfs: z.array(z.instanceof(File)).max(2, "Max 2 PDFs allowed"),
 });
 
 type NoteFormValues = z.infer<typeof noteSchema>;
@@ -34,7 +47,8 @@ interface NoteUploadFormProps {
     title: string,
     descriptions: string,
     thumbnail: File | null,
-    files: File[]
+    images: File[],
+    pdfs: File[]
   ) => void;
   isUploading?: boolean;
 }
@@ -43,14 +57,15 @@ export default function NoteUploadForm({
   onSubmit,
   isUploading = false,
 }: NoteUploadFormProps) {
-  const [files, setFiles] = useState<File[]>([]);
+  
   const [thumbnail, setThumbnail] = useState<File | null>(null);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [pdfFiles, setPdfFiles] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [imageCount, setImageCount] = useState(0);
-  const [pdfCount, setPdfCount] = useState(0);
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const thumbInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const pdfInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<NoteFormValues>({
     resolver: zodResolver(noteSchema),
@@ -58,68 +73,99 @@ export default function NoteUploadForm({
       title: "",
       descriptions: "",
       thumbnail: null,
-      files: [],
+      images: [],
+      pdfs: [],
     },
   });
 
-  const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selected = e.target.files ? Array.from(e.target.files) : [];
-    if (!selected.length) return;
-    e.target.value = ""; // reset input for re-selection
-
-    const pdfs = selected.filter((f) => f.type === "application/pdf");
-    const imgs = selected.filter((f) => f.type.startsWith("image/"));
-
-    const totalImgs = imageCount + imgs.length;
-    const totalPdfs = pdfCount + pdfs.length;
-
-    if (totalImgs > 10) return setError("⚠️ You can upload up to 10 images only.");
-    if (totalPdfs > 2) return setError("⚠️ You can upload up to 2 PDFs only.");
-
-    setError(null);
-    setImageCount(totalImgs);
-    setPdfCount(totalPdfs);
-
-    const updatedFiles = [...files, ...selected];
-    setFiles(updatedFiles);
-    form.setValue("files", updatedFiles);
-  };
-
+  // --------------------------
+  //  HANDLE THUMBNAIL
+  // --------------------------
   const handleThumbnail = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    e.target.value = "";
 
     if (!file.type.startsWith("image/")) {
-      return setError("❌ Thumbnail must be an image file.");
+      setError("❌ Thumbnail must be an image.");
+      return;
     }
 
+    setError(null);
     setThumbnail(file);
     form.setValue("thumbnail", file);
+  };
+
+  // --------------------------
+  //  HANDLE IMAGES
+  // --------------------------
+  const handleImages = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files ? Array.from(e.target.files) : [];
+    if (!selected.length) return;
+
+    const imgs = selected.filter((f) => f.type.startsWith("image/"));
+    if (imgs.length !== selected.length) {
+      return setError("❌ Only image files allowed here.");
+    }
+
+    if (imageFiles.length + imgs.length > 10) {
+      return setError("⚠️ Max 10 images allowed.");
+    }
+
+    const updated = [...imageFiles, ...imgs];
+    setImageFiles(updated);
+    form.setValue("images", updated);
     setError(null);
   };
 
-  const removeFile = (index: number) => {
-    const file = files[index];
-    const updated = files.filter((_, i) => i !== index);
-    setFiles(updated);
+  // --------------------------
+  //  HANDLE PDFs
+  // --------------------------
+  const handlePdfs = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files ? Array.from(e.target.files) : [];
+    if (!selected.length) return;
 
-    if (file.type.startsWith("image/")) setImageCount((c) => c - 1);
-    else if (file.type === "application/pdf") setPdfCount((c) => c - 1);
+    const pdfs = selected.filter((f) => f.type === "application/pdf");
+    if (pdfs.length !== selected.length) {
+      return setError("❌ Only PDF files allowed.");
+    }
 
-    form.setValue("files", updated);
+    if (pdfFiles.length + pdfs.length > 2) {
+      return setError("⚠️ Max 2 PDFs allowed.");
+    }
+
+    const updated = [...pdfFiles, ...pdfs];
+    setPdfFiles(updated);
+    form.setValue("pdfs", updated);
+    setError(null);
+  };
+
+  const removeImage = (i: number) => {
+    const updated = imageFiles.filter((_, idx) => idx !== i);
+    setImageFiles(updated);
+    form.setValue("images", updated);
+  };
+
+  const removePdf = (i: number) => {
+    const updated = pdfFiles.filter((_, idx) => idx !== i);
+    setPdfFiles(updated);
+    form.setValue("pdfs", updated);
   };
 
   const onSubmitForm = (data: NoteFormValues) => {
-    onSubmit(data.title, data.descriptions || "", data.thumbnail || null, data.files);
+    onSubmit(
+      data.title,
+      data.descriptions || "",
+      data.thumbnail || null,
+      data.images,
+      data.pdfs
+    );
   };
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmitForm)}
-        className="w-full space-y-6"
-      >
+    <Form {...form} >
+      <form onSubmit={form.handleSubmit(onSubmitForm)} className="space-y-6 w-full">
+        
+        {/* ==================== TITLE ==================== */}
         <FormField
           control={form.control}
           name="title"
@@ -127,18 +173,14 @@ export default function NoteUploadForm({
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="Enter note title"
-                  {...field}
-                  disabled={isUploading}
-                  className="bg-transparent text-gray-200 border-gray-700 focus:ring-[#FFD700]"
-                />
+                <Input {...field} disabled={isUploading} className="bg-transparent" />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
+        {/* ==================== DESCRIPTION ==================== */}
         <FormField
           control={form.control}
           name="descriptions"
@@ -146,135 +188,140 @@ export default function NoteUploadForm({
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea
-                  placeholder="Write a short description..."
-                  {...field}
-                  disabled={isUploading}
-                  className="bg-transparent text-gray-200 border-gray-700 focus:ring-[#FFD700]"
-                />
+                <Textarea {...field} disabled={isUploading} className="bg-transparent" />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
 
+        {/* ==================== THUMBNAIL ==================== */}
         <FormItem>
-          <FormLabel>Thumbnail (optional)</FormLabel>
+          <FormLabel>Thumbnail</FormLabel>
           <div
+            className="border-2 border-dashed border-gray-700 p-4 rounded-xl cursor-pointer"
             onClick={() => thumbInputRef.current?.click()}
-            className="border-2 border-dashed border-gray-700 hover:border-[#FFD700]/50 rounded-xl p-5 text-center cursor-pointer relative"
           >
             <Input
               ref={thumbInputRef}
               type="file"
               accept="image/*"
-              disabled={isUploading}
               onChange={handleThumbnail}
-              className="absolute inset-0 opacity-0 cursor-pointer"
+              className="hidden"
+              disabled={isUploading}
             />
+
             {thumbnail ? (
               <img
                 src={URL.createObjectURL(thumbnail)}
-                alt="Thumbnail"
-                className="mx-auto h-20 w-20 object-cover rounded-lg border border-gray-700"
+                className="h-20 w-20 mx-auto rounded-lg"
               />
             ) : (
-              <FileImage className="w-7 h-7 text-[#FFD700] mx-auto" />
+              <FileImage className="mx-auto text-yellow-400 h-8 w-8" />
             )}
           </div>
-          <FormMessage />
         </FormItem>
 
-        <FormField
-          control={form.control}
-          name="files"
-          render={() => (
-            <FormItem>
-              <FormLabel>Note Files</FormLabel>
-              <div
-                onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-gray-700 hover:border-[#FFD700]/50 rounded-xl p-6 text-center cursor-pointer relative"
-              >
-                <Input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  multiple
-                  disabled={isUploading}
-                  onChange={handleFiles}
-                  className="absolute inset-0 opacity-0 cursor-pointer"
-                />
-                <UploadCloud className="w-8 h-8 text-[#FFD700] mx-auto mb-2" />
-                <p className="text-gray-400 text-sm">Click or drag to upload files</p>
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* ====================================================== */}
+        {/* ==================== IMAGE UPLOAD ==================== */}
+        {/* ====================================================== */}
+        <FormItem>
+          <FormLabel>Images (Max 10)</FormLabel>
+          <div
+            className="border-2 border-dashed border-gray-700 p-5 rounded-xl cursor-pointer"
+            onClick={() => imageInputRef.current?.click()}
+          >
+            <Input
+              ref={imageInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleImages}
+              className="hidden"
+              disabled={isUploading}
+            />
+            <UploadCloud className="mx-auto text-yellow-400 h-7 w-7" />
+            <p className="text-gray-400 text-sm mt-1">Upload Images</p>
+          </div>
 
-        {/* ⚠️ Warning and Count Summary */}
-        <div className="text-sm text-gray-400 flex flex-col gap-1">
-          <p>🖼️ {imageCount} / 10 Images</p>
-          <p>📄 {pdfCount} / 2 PDFs</p>
-          <p>🖋️ Thumbnail: {thumbnail ? "1 selected" : "None"}</p>
-          {error && (
-            <div className="flex items-center text-red-400 gap-2 mt-1">
-              <AlertCircle className="w-4 h-4" /> {error}
-            </div>
-          )}
-        </div>
+          {/* IMAGE LIST */}
+          {imageFiles.map((file, index) => (
+            <Card key={index} className="bg-black border-gray-800 mt-2">
+              <CardContent className="flex justify-between p-3">
+                <div className="flex gap-2 items-center">
+                  <FileImage className="text-yellow-400 h-5 w-5" />
+                  <p className="text-gray-300 text-sm">{file.name}</p>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => removeImage(index)}>
+                  <Trash2 className="text-red-500 h-4 w-4" />
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </FormItem>
 
-        {/* File List */}
-        {files.length > 0 && (
-          <div className="space-y-2 max-h-[40vh] overflow-y-auto pr-1">
-            {files.map((file, i) => (
-              <Card key={file.name + i} className="bg-[#0a0a0a] border-gray-800">
-                <CardContent className="flex items-center justify-between p-3">
-                  <div className="flex items-center gap-3">
-                    {file.type.startsWith("image/") ? (
-                      <FileImage className="w-5 h-5 text-[#FFD700]" />
-                    ) : (
-                      <FileText className="w-5 h-5 text-[#FFD700]" />
-                    )}
-                    <p className="text-sm text-gray-300 truncate">{file.name}</p>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeFile(i)}
-                    disabled={isUploading}
-                  >
-                    <Trash2 className="w-4 h-4 text-red-500" />
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+        {/* ====================================================== */}
+        {/* ==================== PDF UPLOAD ====================== */}
+        {/* ====================================================== */}
+        <FormItem>
+          <FormLabel>PDF Files (Max 2)</FormLabel>
+          <div
+            className="border-2 border-dashed border-gray-700 p-5 rounded-xl cursor-pointer"
+            onClick={() => pdfInputRef.current?.click()}
+          >
+            <Input
+              ref={pdfInputRef}
+              type="file"
+              accept="application/pdf"
+              multiple
+              onChange={handlePdfs}
+              className="hidden"
+              disabled={isUploading}
+            />
+            <UploadCloud className="mx-auto text-yellow-400 h-7 w-7" />
+            <p className="text-gray-400 text-sm mt-1">Upload PDFs</p>
+          </div>
+
+          {/* PDF LIST */}
+          {pdfFiles.map((file, index) => (
+            <Card key={index} className="bg-black border-gray-800 mt-2">
+              <CardContent className="flex justify-between p-3">
+                <div className="flex gap-2 items-center">
+                  <FileText className="text-yellow-400 h-5 w-5" />
+                  <p className="text-gray-300 text-sm">{file.name}</p>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => removePdf(index)}>
+                  <Trash2 className="text-red-500 h-4 w-4" />
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </FormItem>
+
+        {/* ==================== ERRORS ==================== */}
+        {error && (
+          <div className="flex items-center text-red-400 gap-2 mt-1">
+            <AlertCircle className="w-4 h-4" /> {error}
           </div>
         )}
 
-        <div className="space-y-3">
-          <Button
-            type="submit"
-            disabled={isUploading}
-            className="w-full bg-[#FFD700] hover:bg-[#e6c200] text-black font-semibold flex items-center justify-center gap-2 transition-all duration-200"
-          >
-            {isUploading ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Uploading...
-              </>
-            ) : (
-              "Upload Notes"
-            )}
-          </Button>
-
-          {isUploading && (
-            <Progress
-              value={70} // dummy progress or controlled externally
-              className="h-2 bg-gray-800 [&>div]:bg-[#FFD700] animate-pulse"
-            />
+        {/* ==================== SUBMIT ==================== */}
+        <Button type="submit" disabled={isUploading} className="w-full bg-yellow-400 text-black">
+          {isUploading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Uploading...
+            </>
+          ) : (
+            "Upload Notes"
           )}
-        </div>
+        </Button>
+
+        {isUploading && (
+          <Progress
+            value={60}
+            className="h-2 bg-gray-800 [&>div]:bg-yellow-400 animate-pulse"
+          />
+        )}
 
       </form>
     </Form>

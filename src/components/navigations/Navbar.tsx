@@ -35,7 +35,6 @@ export default function Navbar() {
     { name: "Home", href: "/" },
     { name: "Features", href: "/features" },
     { name: "Upload Notes", href: "/upload-notes" },
-    { name: "Dashboard", href: "/dashboard" },
   ];
 
   return (
