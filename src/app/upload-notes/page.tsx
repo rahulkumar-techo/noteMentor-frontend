@@ -1,72 +1,119 @@
 "use client";
 
-/**
- * 📤 Upload Note Page
- * - Fully responsive (mobile → desktop)
- * - Two-column layout (Upload Form + Share Links)
- * - Prevents content from being hidden under the fixed navbar
- */
-
 import { useState } from "react";
-import NoteUploadForm from "@/components/note/NoteUploadForm";
-import ShareLinkBox from "@/components/note/ShareLinkBox";
+import NoteUploadForm from "@/app/upload-notes/(components)/NoteUploadForm";
+import { useUploadNoteMutation } from "@/feature/note/noteApi";
+import useApiMessage from "@/hooks/api-message";
+import { Card, CardContent } from "@/components/ui/card";
+import Image from "next/image";
 
 export default function UploadNotePage() {
-  const [shareLinks, setShareLinks] = useState<string[]>([]);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [uploadNote, { isLoading, isSuccess, isError, error, data }] =
+    useUploadNoteMutation();
 
-  const handleUploadSuccess = (urls: string[]) => {
-    const base = window.location.origin;
-    const links = urls.map(
-      (url) => `${base}/note/${encodeURIComponent(url.split("/").pop() || "")}`
-    );
-    setShareLinks(links);
+  useApiMessage({
+    isSuccess,
+    isError,
+    error,
+    successMessage: data?.message || "Note uploaded successfully!",
+    redirectPath:`/dashboard/my-notes`
+  });
+
+  const handleUpload = async (
+    title: string,
+    descriptions: string,
+    thumbnail: File | null,
+    files: File[]
+  ) => {
+    try {
+      const formData = new FormData();
+      formData.append("title", title);
+      if (descriptions) formData.append("descriptions", descriptions);
+      if (thumbnail) formData.append("thumbnail", thumbnail);
+
+      files.forEach((file) => {
+        if (file.type === "application/pdf") {
+          formData.append("notePdfs", file);
+        } else if (file.type.startsWith("image/")) {
+          formData.append("noteImages", file);
+        }
+      });
+
+      await uploadNote(formData).unwrap();
+    } catch (err) {
+      console.error("❌ Upload failed:", err);
+    }
   };
 
+  const note = data?.data;
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black text-white px-6">
-      {/* Add top padding to prevent overlap with navbar */}
-      <div className="w-full max-w-6xl flex flex-col pt-24 pb-10 md:pt-28">
-        {/* Page Title */}
-        <h1 className="text-3xl md:text-4xl font-bold text-[#FFD700] mb-10 text-center">
-          📚 Upload Your Notes
-        </h1>
+    <main className="min-h-screen flex items-center justify-center bg-gradient-to-b from-black via-[#0a0a0a] to-[#1a1a1a] text-white px-6">
+      <section className="w-full max-w-5xl pt-24 md:pt-28 pb-16 space-y-10">
+        <div className="text-center space-y-2">
+          <h1 className="text-3xl md:text-4xl font-semibold text-[#FFD700] tracking-wide">
+            Upload Your Notes
+          </h1>
+          <p className="text-sm text-gray-400">
+            Upload PDFs, images, and an optional thumbnail to store and share
+            instantly.
+          </p>
+        </div>
 
-        {/* Responsive Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
-          {/* Upload Section */}
-          <div className="w-full flex flex-col items-center justify-center">
-            <NoteUploadForm
-              onUploadSuccess={handleUploadSuccess}
-              onFileSelect={setSelectedFiles}
-            />
+        <div className="flex flex-col items-center w-full bg-[#0d0d0f]/70 border border-gray-800 rounded-2xl shadow-lg p-6 backdrop-blur-lg hover:shadow-[#FFD700]/10 transition">
+          <NoteUploadForm onSubmit={handleUpload} isUploading={isLoading} />
+        </div>
 
-            {selectedFiles.length > 0 && (
-              <p className="mt-4 text-sm text-gray-400 italic text-center">
-                {selectedFiles.length} file
-                {selectedFiles.length > 1 ? "s" : ""} selected.
-              </p>
-            )}
-          </div>
+        {note && (
+          <Card className="bg-[#0d0d0f]/80 border border-gray-800 text-gray-200 rounded-2xl shadow-lg mt-8">
+            <CardContent className="p-6 space-y-4">
+              <h2 className="text-xl font-semibold text-[#FFD700] mb-3">
+                ✅ Upload Successful
+              </h2>
 
-          {/* Share Link Section */}
-          <div className="w-full flex flex-col items-center justify-start">
-            {shareLinks.length > 0 ? (
-              <div className="w-full space-y-4 overflow-y-auto max-h-[70vh] px-1">
-                {shareLinks.map((link) => (
-                  <ShareLinkBox key={link} link={link} />
-                ))}
-              </div>
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-500 border border-gray-800 bg-[#0d0d0f]/40 rounded-xl p-6 text-center">
-                <p className="text-sm md:text-base">
-                  🔗 Share links will appear here after uploading your notes.
+              {note.thumbnail?.secure_url && (
+                <div className="flex justify-center">
+                  <Image
+                    src={note.thumbnail.secure_url}
+                    alt={note.title}
+                    width={180}
+                    height={120}
+                    className="rounded-xl border border-gray-700"
+                  />
+                </div>
+              )}
+
+              <div className="space-y-1 text-sm">
+                <p>
+                  <span className="font-medium text-[#FFD700]">Title:</span>{" "}
+                  {note.title}
+                </p>
+                {note.descriptions && (
+                  <p>
+                    <span className="font-medium text-[#FFD700]">
+                      Description:
+                    </span>{" "}
+                    {note.descriptions}
+                  </p>
+                )}
+                <p>
+                  <span className="font-medium text-[#FFD700]">Uploaded At:</span>{" "}
+                  {new Date(note.createdAt).toLocaleString()}
                 </p>
               </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
+
+              <div className="flex flex-wrap gap-3 mt-4 text-sm text-gray-400">
+                {note.noteImages?.length > 0 && (
+                  <p>🖼️ {note.noteImages.length} image(s)</p>
+                )}
+                {note.notePdfs?.length > 0 && (
+                  <p>📄 {note.notePdfs.length} PDF(s)</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </section>
+    </main>
   );
 }

@@ -36,8 +36,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { questionValidation, QuestionValidationType } from "./note.schema";
-import { Spinner } from "../ui/spinner";
+import { questionValidation, QuestionValidationType } from "../../../../components/note/note.schema";
+import { Spinner } from "../../../../components/ui/spinner";
 import { Brain } from "lucide-react";
 
 const NoteForm = () => {

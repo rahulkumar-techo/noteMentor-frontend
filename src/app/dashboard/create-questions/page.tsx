@@ -2,8 +2,8 @@
 "use client";
 
 import React from "react";
-import NoteForm from "@/components/note/NoteForm";
-import DisplayData from "@/components/note/DisplayData";
+import NoteForm from "@/app/dashboard/create-questions/(components)/NoteForm";
+import DisplayData from "@/app/dashboard/create-questions/(components)/DisplayData";
 
 const Page = () => {
   return (

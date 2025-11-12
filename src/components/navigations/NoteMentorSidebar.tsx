@@ -39,7 +39,7 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { icon: Home, label: "Dashboard", href: "/dashboard" },
-  { icon: BookOpen, label: "My Notes", href: "/dashboard/notes" },
+  { icon: BookOpen, label: "My Notes", href: "/dashboard/my-notes" },
   { icon: FileText, label: "Subjects", href: "/dashboard/subjects" },
   { icon: Brain, label: "Quizzes", href: "/dashboard/quizzes" },
   { icon: Settings, label: "Settings", href: "/dashboard/settings" },

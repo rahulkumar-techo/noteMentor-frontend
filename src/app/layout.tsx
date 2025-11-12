@@ -28,12 +28,6 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
           <ClientProvider>
             <div className="flex h-screen w-full">
               <main className="relative flex-1 h-screen overflow-y-auto w-full text-white">
@@ -41,7 +35,6 @@ export default function RootLayout({
               </main>
             </div>
           </ClientProvider>
-        </ThemeProvider>
       </body>
     </html>
   );

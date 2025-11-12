@@ -7,6 +7,7 @@ import { FcGoogle } from "react-icons/fc";
 import { Button } from "@/components/ui/button";
 
 export default function SignupPage() {
+  const backendUrl = "http://localhost:5000"
   return (
     <div className="min-h-screen flex flex-col justify-center items-center  relative overflow-hidden">
       {/* Animated Soft Glow */}
@@ -30,7 +31,7 @@ export default function SignupPage() {
 
         {/* 🔥 Highlighted Google Signup */}
         <Button
-          onClick={() => console.log("Google Signup")}
+          onClick={() => window.location.replace(`${backendUrl}/auth/google`)}
           className="w-full bg-white text-gray-800 hover:bg-gray-100 py-6 text-base font-semibold rounded-2xl flex items-center justify-center gap-3 shadow-lg transition-all hover:scale-[1.02]"
         >
           <FcGoogle size={24} />
