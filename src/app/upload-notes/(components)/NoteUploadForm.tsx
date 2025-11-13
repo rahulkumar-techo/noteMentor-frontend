@@ -51,13 +51,15 @@ interface NoteUploadFormProps {
     pdfs: File[]
   ) => void;
   isUploading?: boolean;
+  progressValue: number
 }
 
 export default function NoteUploadForm({
   onSubmit,
   isUploading = false,
+  progressValue = 0
 }: NoteUploadFormProps) {
-  
+
   const [thumbnail, setThumbnail] = useState<File | null>(null);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [pdfFiles, setPdfFiles] = useState<File[]>([]);
@@ -164,7 +166,7 @@ export default function NoteUploadForm({
   return (
     <Form {...form} >
       <form onSubmit={form.handleSubmit(onSubmitForm)} className="space-y-6 w-full">
-        
+
         {/* ==================== TITLE ==================== */}
         <FormField
           control={form.control}
@@ -305,23 +307,46 @@ export default function NoteUploadForm({
         )}
 
         {/* ==================== SUBMIT ==================== */}
-        <Button type="submit" disabled={isUploading} className="w-full bg-yellow-400 text-black">
+        <Button
+          type="submit"
+          disabled={isUploading}
+          className={`w-full font-semibold text-black transition-all duration-300
+    ${isUploading ? "bg-yellow-500 opacity-90" : "bg-yellow-400 hover:bg-yellow-500"}`}
+        >
           {isUploading ? (
-            <>
+            <div className="flex items-center gap-2">
               <Loader2 className="w-4 h-4 animate-spin" />
-              Uploading...
-            </>
+              <span className="animate-pulse">Uploading...</span>
+            </div>
           ) : (
             "Upload Notes"
           )}
         </Button>
 
         {isUploading && (
-          <Progress
-            value={60}
-            className="h-2 bg-gray-800 [&>div]:bg-yellow-400 animate-pulse"
-          />
+          <div className="mt-4 flex flex-col gap-2 animate-fadeIn">
+            <span className="text-sm font-medium text-yellow-300 drop-shadow-sm">
+              {progressValue}%
+            </span>
+
+            <div
+              className="
+        relative w-full h-3 rounded-full overflow-hidden
+        bg-black/30 backdrop-blur-xl border border-yellow-500/20 shadow-md
+      "
+            >
+              <div
+                className="
+        h-full rounded-full transition-all duration-500 ease-out
+        bg-linear-to-r from-yellow-300 via-yellow-400 to-yellow-500
+        animate-progressGlow
+        "
+                style={{ width: `${progressValue}%` }}
+              ></div>
+            </div>
+          </div>
         )}
+
 
       </form>
     </Form>

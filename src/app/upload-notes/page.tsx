@@ -6,10 +6,18 @@ import useApiMessage from "@/hooks/api-message";
 import { Card, CardContent } from "@/components/ui/card";
 import NoteUploadForm from "@/app/upload-notes/(components)/NoteUploadForm";
 import Image from "next/image";
+import { useUploadNoteWithProgressMutation } from "@/feature/note/progress-uploadApi";
+import { useState } from "react";
 
 export default function UploadNotePage() {
+  // const [uploadNote, { isLoading, isSuccess, isError, error, data }] =
+  //   useUploadNoteMutation();
+
+    const [progress, setProgress] = useState(0);
   const [uploadNote, { isLoading, isSuccess, isError, error, data }] =
-    useUploadNoteMutation();
+    useUploadNoteWithProgressMutation();
+
+    console.log(progress)
 
   // Notifications + redirect.
   useApiMessage({
@@ -41,7 +49,7 @@ export default function UploadNotePage() {
       images.forEach((img) => formData.append("noteImages", img));
       pdfs.forEach((pdf) => formData.append("notePdfs", pdf));
 
-      await uploadNote(formData).unwrap();
+      await uploadNote({formData,   onProgress: (percent:any) => setProgress(percent)}).unwrap();
     } catch (err) {
       console.error("❌ Upload failed:", err);
     }
@@ -66,6 +74,7 @@ export default function UploadNotePage() {
         {/* Upload Form */}
         <div className="flex flex-col items-center w-full bg-[#0d0d0f]/70 border border-gray-800 rounded-2xl shadow-lg p-6 backdrop-blur-lg hover:shadow-[#FFD700]/10 transition">
           <NoteUploadForm
+          progressValue={progress}
             onSubmit={handleUpload}
             isUploading={isLoading}
           />
