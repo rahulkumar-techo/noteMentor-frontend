@@ -9,15 +9,6 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ScrollArea } from "@/components/ui/scroll-area"
 import ClientProvider from "@/components/provider/ClientProvider";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "NoteMentor Dashboard",
@@ -43,7 +34,7 @@ export default function RootLayout({
                 <SidebarTrigger />
               </div>
               <div className="px-1 py-6 md:px-6 ">
-                <div className=" md:max-h-screen overflow-y-auto">
+                <div className=" md:max-h-[93vh] overflow-y-auto">
                   {children}
                 </div>
               </div>
