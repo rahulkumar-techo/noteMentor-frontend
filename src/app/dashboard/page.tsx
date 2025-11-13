@@ -131,7 +131,7 @@ const DashboardPage = () => {
         {cards.map((card, index) => (
           <div
             key={index}
-            className="w-full max-w-sm hover:-translate-y-1 transition-transform duration-300"
+            className="w-full max-w-md hover:-translate-y-1 transition-transform duration-300"
           >
             <NoteCard
               title={card.title}

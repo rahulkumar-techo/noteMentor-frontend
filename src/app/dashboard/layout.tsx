@@ -43,9 +43,9 @@ export default function RootLayout({
                 <SidebarTrigger />
               </div>
               <div className="px-1 py-6 md:px-6 ">
-                <ScrollArea className=" md:max-h-[10vh]">
+                <div className=" md:max-h-screen overflow-y-auto">
                   {children}
-                </ScrollArea>
+                </div>
               </div>
             </main>
           </div>

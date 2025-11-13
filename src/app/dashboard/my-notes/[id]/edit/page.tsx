@@ -53,6 +53,7 @@ export default function EditNoteClient() {
     return <p className="text-center text-gray-400 mt-10">Loading note...</p>;
 
   return (
+    
     <EditNoteForm
       note={noteData?.data}
       onSubmitForm={handleSubmit}

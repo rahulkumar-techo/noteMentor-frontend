@@ -150,6 +150,7 @@ export default function EditNoteForm({
 
   return (
     <div className="bg-[#0b0b0b] border border-[#FFD700]/30 text-white rounded-2xl p-6 shadow-lg space-y-6">
+      
       {/* ✅ Success Message */}
       {success && (
         <Alert className="bg-green-900/40 border-green-600 text-green-300">
