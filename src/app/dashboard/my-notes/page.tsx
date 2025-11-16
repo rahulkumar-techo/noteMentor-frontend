@@ -1,7 +1,7 @@
 "use client";
 
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useGetNotesQuery } from "@/feature/note/noteApi";
@@ -14,8 +14,14 @@ export default function NotesPage() {
   const [page, setPage] = useState(1);
 
   // 🔹 Fetch notes from API
-  const { data, isLoading, isError } = useGetNotesQuery(undefined);
+  const { data, isLoading, isError,refetch } = useGetNotesQuery(undefined);
   const notes = data?.data?.notes || [];
+
+  console.log(data)
+
+  useEffect(()=>{
+    refetch()
+  },[])
 
   // 🔹 Pagination logic
   const notesPerPage = 8;
@@ -79,7 +85,7 @@ export default function NotesPage() {
                 descriptions={note.descriptions}
                 thumbnail={
                   typeof note.thumbnail === "object"
-                    ? note.thumbnail.secure_url
+                    ? note?.thumbnail?.secure_url
                     : ""
                 }
                 createdAt={note.createdAt}

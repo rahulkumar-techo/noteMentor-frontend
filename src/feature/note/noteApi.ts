@@ -78,7 +78,11 @@ export const noteApi = api.injectEndpoints({
       }),
       invalidatesTags: (result, error, { id }) => [{ type: "Note", id }],
     }),
+    
+
+
   }),
+
 
   overrideExisting: true, // 🔁 safer for hot reload in dev
 });
@@ -91,7 +95,8 @@ export const {
   useGetNotesQuery,
   useGetNoteByIdQuery,
   useUpdateNoteSettingsMutation,
-  useDeleteNoteMutation
+  useDeleteNoteMutation,
+
 } = noteApi;
 
 export default noteApi;

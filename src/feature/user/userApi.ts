@@ -1,4 +1,5 @@
 import api from "../mainApi";
+import { setUser } from "./user.slice";
 
 
 export const userApi = api.injectEndpoints({
@@ -7,6 +8,15 @@ export const userApi = api.injectEndpoints({
       query: () => "/me",
       providesTags: ["User"],
 
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          // save user in redux slice
+          dispatch(setUser({ user: data?.data }));
+        } catch (err) {
+          console.log("User fetch error", err);
+        }
+      },
     }),
     updateAcademic: builder.mutation({
       query: (data) => ({

@@ -24,7 +24,9 @@ export default function Navbar() {
   if (
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/login") ||
-    pathname.startsWith("/signup")
+    pathname.startsWith("/signup")||
+    pathname.startsWith("/feed")||
+    pathname.startsWith("/note")
   ) {
     return null;
   }
@@ -32,7 +34,7 @@ export default function Navbar() {
   const navItems = [
     { name: "Home", href: "/" },
     { name: "Features", href: "/features" },
-    { name: "Materials", href: "/materials" },
+    { name: "Feed", href: "/feed" },
     { name: "Upload Notes", href: "/upload-notes" },
   ];
 

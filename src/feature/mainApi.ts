@@ -17,7 +17,7 @@ const baseQuery = fetchBaseQuery({
 export const api = createApi({
   reducerPath: "api",
   baseQuery,
-  tagTypes: ["User", "Note", "Quiz", "Result"],
+  tagTypes: ["User", "Note", "Quiz", "Result","Comments"],
   endpoints: () => ({}), // endpoints injected in feature files
 });
 
