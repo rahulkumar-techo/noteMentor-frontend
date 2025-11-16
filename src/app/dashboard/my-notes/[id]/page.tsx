@@ -20,6 +20,7 @@ import { NoteAttachments } from "./(components)/NoteAttachments";
 import { DeleteConfirmDialog } from "./(components)/DeleteConfirmDialog";
 import NoteSettings from "./(components)/NoteSettings";
 import NoteDetailsSkeleton from "@/components/common/skeletonLoader";
+import CommentSystem from "@/components/comment-sys/CommentSystem";
 // import CommentSystem from "@/components/comment-sys/CommentSystem";
 
 export default function NoteDetailsPage() {
@@ -131,6 +132,7 @@ export default function NoteDetailsPage() {
   return (
     <main className="min-h-screen text-white">
       <section className="w-full md:max-w-6xl md:mx-auto space-y-10">
+        
 
         {/* --- Header --- */}
         <NoteHeader
@@ -176,12 +178,9 @@ export default function NoteDetailsPage() {
         </div>
 
         {/* --- Comments System --- */}
-        {/* <CommentSystem
-          comments={comData?.comments || []}
-          loading={isLoading}
-          onAdd={handleAddComment}
-          onDelete={handleDeleteComment}
-        /> */}
+      <CommentSystem
+      noteId={id as string}
+      />
 
         {/* --- Back Button --- */}
         <div className="flex justify-center pt-8">

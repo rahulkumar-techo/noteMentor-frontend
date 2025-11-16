@@ -2,101 +2,91 @@ import api from "../mainApi";
 
 export const noteApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    // 🧾 Upload Note
-    uploadNote: builder.mutation<void, FormData>({
-      query: (formData) => ({
+
+    // create note
+    uploadNote: builder.mutation<any, Record<string, any>>({
+      query: (data) => ({
         url: "/note/upload",
         method: "POST",
-        body: formData,
+        body: data,
       }),
       invalidatesTags: ["Note"],
     }),
 
-    // ✏️ Update Note
-    updateNote: builder.mutation<
-      any,
-      { noteId: string; formData: FormData }
-    >({
-      query: ({ noteId, formData }) => ({
-        url: `/note/update/${noteId}`,
-        method: "PUT",
-        body: formData,
-      }),
-      invalidatesTags: (result, error, { noteId }) => [
-        { type: "Note", id: noteId },
-      ],
-    }),
+    // update note
+   updateNote: builder.mutation<
+  any,
+  { noteId: string; formData: Record<string, any> }
+>({
+  query: ({ noteId, formData }) => ({
+    url: `/note/update/${noteId}`,
+    method: "PUT",
+    body: formData,
+  }),
+  invalidatesTags: (result, error, { noteId }) => [
+    { type: "Note", id: noteId },
+  ],
+}),
 
-    // 🗑️ Delete Files (images, pdfs, thumb)
+
+    // delete selected files
     deleteNoteFiles: builder.mutation<
       any,
       { noteId: string; noteImageIds?: string[]; notePdfIds?: string[]; thumbId?: string }
     >({
-      query: ({ noteId, noteImageIds = [], notePdfIds = [], thumbId = "" }) => ({
-        url: "/note/files",
-        method: "DELETE",
-        body: { noteId, noteImageIds, notePdfIds, thumbId },
+      query: (data) => ({
+        url: "/note/delete-files",
+        method: "POST",
+        body: data,
       }),
-      invalidatesTags: (result, error, { noteId }) => [
-        { type: "Note", id: noteId },
-      ],
+      invalidatesTags: ["Note"],
     }),
-    // 🗑️ Delete Entire Note
+
+    // delete note
     deleteNote: builder.mutation<any, { noteId: string }>({
       query: ({ noteId }) => ({
         url: `/note/delete/${noteId}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Note"], // refresh all note lists
+      invalidatesTags: ["Note"],
     }),
 
-    // 📚 Get All Notes
+    // list notes
     getNotes: builder.query<any, void>({
-      query: () => ({
-        url: "/note/all",
-        method: "GET",
-        credentials: "include",
-      }),
+      query: () => "/note/list",
       providesTags: ["Note"],
     }),
 
-    // 📄 Get Note by ID
+    // get note by id
     getNoteById: builder.query<any, string>({
       query: (id) => `/note/${id}`,
-      providesTags: (result, error, id) => [{ type: "Note", id }],
+      providesTags: (r, e, id) => [{ type: "Note", id }],
     }),
 
-    // ⚙️ Update Note Settings
-    updateNoteSettings: builder.mutation<
-      any,
-      { id: string; settings: Record<string, any> }
-    >({
+    // update settings
+    updateNoteSettings: builder.mutation<any, { id: string; settings: any }>({
       query: ({ id, settings }) => ({
         url: `/note/settings/${id}`,
-        method: "PATCH",
+        method: "PUT",
         body: settings,
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: "Note", id }],
+      invalidatesTags: (r, e, { id }) => [{ type: "Note", id }],
     }),
-    
-
 
   }),
 
-
-  overrideExisting: true, // 🔁 safer for hot reload in dev
+  overrideExisting: true,
 });
 
-// ✅ Export Hooks
+// hooks
 export const {
   useUploadNoteMutation,
   useUpdateNoteMutation,
   useDeleteNoteFilesMutation,
+  useDeleteNoteMutation,
   useGetNotesQuery,
   useGetNoteByIdQuery,
   useUpdateNoteSettingsMutation,
-  useDeleteNoteMutation,
-
 } = noteApi;
 
 export default noteApi;

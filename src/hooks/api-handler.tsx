@@ -1,135 +1,90 @@
 "use client";
 
-import axiosInstance from "@/feature/axiosInstance";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
+import axios from "axios";
 
-export type UploadConfig<TExtra extends Record<string, any> = {}> = {
-  path: string;
-  method?: "post" | "put" | "patch";
-  extraData?: TExtra;
-  retries?: number;
-};
-
-export type FileUploadResult<T = any> = {
-  message: string;
-  data: T;
-};
-
-export function useFileUpload<
-  TResponse = any,
-  TExtra extends Record<string, any> = {}
->({
-  path,
-  method = "post",
-  extraData = {} as TExtra,
-  retries = 1,
-}: UploadConfig<TExtra>) {
+export function useCloudinaryUpload() {
   const [progress, setProgress] = useState(0);
-  const [fileProgress] = useState<number[]>([]);
   const [speed, setSpeed] = useState(0);
   const [eta, setEta] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [response, setResponse] =
-    useState<FileUploadResult<TResponse> | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const abortCtrl = useRef<AbortController | null>(null);
 
-  /** Auto-cancel upload on unmount (page change) */
   useEffect(() => {
     return () => abortCtrl.current?.abort();
   }, []);
 
-  /** Main upload executor */
-  const upload = useCallback(
-    async (formData: FormData) => {
-      abortCtrl.current = new AbortController();
-      let attempt = 0;
+  // ⬆️ Upload file → Cloudinary using signed credentials
+  const upload = async (
+    file: File,
+    signatureData: {
+      timestamp: number;
+      signature: string;
+      apiKey: string;
+      cloudName: string;
+      folder: string;
+    }
+  ) => {
+    abortCtrl.current = new AbortController();
 
-      const executeUpload = async (): Promise<FileUploadResult<TResponse>> => {
-        attempt++;
+    try {
+      setLoading(true);
+      setError(null);
+      setProgress(0);
 
-        const startTime = Date.now();
-        let lastLoaded = 0;
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("api_key", signatureData.apiKey);
+      formData.append("timestamp", String(signatureData.timestamp));
+      formData.append("signature", signatureData.signature);
+      formData.append("folder", signatureData.folder);
 
-        try {
-          setLoading(true);
-          setError(null);
-          setResponse(null);
-          setProgress(0);
-          setSpeed(0);
-          setEta(0);
+      const start = Date.now();
+      let lastLoaded = 0;
 
-          /** Append extraData to formData */
-          for (const key in extraData) {
-            if (Object.prototype.hasOwnProperty.call(extraData, key)) {
-              formData.append(key, String(extraData[key]));
-            }
-          }
+      const res = await axios.post(
+        `https://api.cloudinary.com/v1_1/${signatureData.cloudName}/auto/upload`,
+        formData,
+        {
+          signal: abortCtrl.current.signal,
+          onUploadProgress: (e) => {
+            if (!e.total) return;
+            const percent = Math.round((e.loaded / e.total) * 100);
+            setProgress(percent);
 
-          const res = await axiosInstance.request<FileUploadResult<TResponse>>({
-            url: path,
-            method,
-            data: formData,
-            signal: abortCtrl.current!.signal,
-            headers: { "Content-Type": "multipart/form-data" },
+            const elapsed = (Date.now() - start) / 1000;
+            const currentSpeed = (e.loaded - lastLoaded) / elapsed / 1024;
+            setSpeed(currentSpeed);
+            lastLoaded = e.loaded;
 
-            onUploadProgress: (e) => {
-              if (!e.total) return;
-
-              /** Total progress */
-              const percent = Math.round((e.loaded / e.total) * 100);
-              setProgress(percent);
-
-              /** Upload speed (KB/s) */
-              const elapsedSec = (Date.now() - startTime) / 1000;
-              const currentSpeed = (e.loaded - lastLoaded) / elapsedSec / 1024;
-              setSpeed(currentSpeed);
-
-              /** ETA */
-              const remaining = e.total - e.loaded;
-              const etaSec =
-                remaining / (currentSpeed * 1024 || 1);
-              setEta(etaSec);
-
-              lastLoaded = e.loaded;
-            },
-          });
-
-          setResponse(res.data);
-          return res.data;
-        } catch (err: any) {
-          if (attempt <= retries) {
-            console.warn(`Retrying upload… (attempt ${attempt})`);
-            return executeUpload();
-          }
-
-          setError(err?.message || "Upload failed");
-          throw err;
-        } finally {
-          setLoading(false);
+            const remaining = e.total - e.loaded;
+            const etaSec = remaining / (currentSpeed * 1024 || 1);
+            setEta(etaSec);
+          },
         }
-      };
+      );
 
-      return executeUpload();
-    },
-    [path, method, extraData, retries]
-  );
-
-  /** Cancel upload */
-  const cancelUpload = () => {
-    abortCtrl.current?.abort();
+      return res.data; // Cloudinary JSON
+    } catch (err: any) {
+      setError(err?.message || "Upload failed");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   };
+
+  // cancel upload
+  const cancel = () => abortCtrl.current?.abort();
 
   return {
     upload,
     progress,
-    fileProgress,
     speed,
     eta,
     loading,
-    response,
     error,
-    cancelUpload,
+    cancel,
   };
 }

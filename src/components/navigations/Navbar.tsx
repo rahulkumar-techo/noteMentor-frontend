@@ -26,7 +26,8 @@ export default function Navbar() {
     pathname.startsWith("/login") ||
     pathname.startsWith("/signup")||
     pathname.startsWith("/feed")||
-    pathname.startsWith("/note")
+    pathname.startsWith("/note")||
+    pathname.startsWith("/upload-notes")
   ) {
     return null;
   }
