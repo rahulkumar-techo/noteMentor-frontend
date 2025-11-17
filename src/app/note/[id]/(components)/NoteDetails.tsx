@@ -1,21 +1,32 @@
-// (components)/NoteDetails.tsx
+// description: Note details component displaying title, media files, author info, likes, views, and comments.
+
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 import { PdfViewer } from "./NotePdf";
 import CommentSystem from "@/components/comment-sys/CommentSystem";
 import CustomAvatar from "@/components/CustomAvatar";
+import { ThumbsUp, Eye } from "lucide-react";
+import LikeButton from "./LikeButton";
+import ViewCounter from "@/shared/utils/ViewsCounter";
+import ImagePreview from "@/components/PreviewImage";
 
 interface NoteDetailsProps {
     note: any;
+    toggleLikes?: () => void; // ← inject from parent
 }
 
-export default function NoteDetails({ note }: NoteDetailsProps) {
+export default function NoteDetails({ note, toggleLikes }: NoteDetailsProps) {
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
     if (!note) return <div>No note found</div>;
+
     console.log(note)
+    const isLiked =
+        Array.isArray(note.likes) &&
+        note.likes.includes(note.currentUserId); // you can pass userId later if needed
 
     return (
         <div className="max-w-4xl mx-auto p-4 space-y-8">
@@ -31,13 +42,29 @@ export default function NoteDetails({ note }: NoteDetailsProps) {
             {/* Title */}
             <h1 className="text-3xl font-bold">{note.title}</h1>
 
+            {/* Likes + Views Section */}
+            <div className="flex items-center gap-6 text-sm font-medium">
+
+                {/* Like Button */}
+                <LikeButton
+                    isLiked={note.stats.likes?.includes(note.currentUserId)}
+                    count={note?.stats?.likesCount || 0}
+                    onToggle={toggleLikes ?? (() => { })}
+                />
+
+                {/* Views Counter */}
+                <ViewCounter count={note.stats.viewsCount || 0} />
+
+            </div>
+
             {/* User Info + Description */}
             <div className="text-muted-foreground space-y-3">
                 <div className="flex items-center gap-3">
-                    {/* <div className="w-10 h-10 rounded-full bg-gray-300" /> */}
-                    <CustomAvatar src={note?.authorId?.avatar?.secure_url}/>
+                    <CustomAvatar src={note?.authorId?.avatar?.secure_url} />
                     <div>
-                        <p className="font-medium">{note.authorId?.fullname || "Unknown User"}</p>
+                        <p className="font-medium">
+                            {note.authorId?.fullname || "Unknown User"}
+                        </p>
                         <p className="text-xs text-muted-foreground">
                             {new Date(note.createdAt).toLocaleDateString()}
                         </p>
@@ -61,6 +88,7 @@ export default function NoteDetails({ note }: NoteDetailsProps) {
                                     width={800}
                                     height={500}
                                     className="w-full rounded-md object-cover"
+                                    onClick={() => setPreviewImage(img.secure_url)}
                                 />
                             </CardContent>
                         </Card>
@@ -80,13 +108,18 @@ export default function NoteDetails({ note }: NoteDetailsProps) {
                     ))}
                 </div>
             )}
+            {previewImage && (
+                <ImagePreview
+                    src={previewImage}
+                    onClose={() => setPreviewImage(null)}
+                />
+            )}
+
 
             <Separator />
 
             {/* Comments Section */}
-
             <section>
-                
                 <CommentSystem noteId={note._id} />
             </section>
         </div>

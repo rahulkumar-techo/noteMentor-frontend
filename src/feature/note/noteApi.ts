@@ -14,19 +14,19 @@ export const noteApi = api.injectEndpoints({
     }),
 
     // update note
-   updateNote: builder.mutation<
-  any,
-  { noteId: string; formData: Record<string, any> }
->({
-  query: ({ noteId, formData }) => ({
-    url: `/note/update/${noteId}`,
-    method: "PUT",
-    body: formData,
-  }),
-  invalidatesTags: (result, error, { noteId }) => [
-    { type: "Note", id: noteId },
-  ],
-}),
+    updateNote: builder.mutation<
+      any,
+      { noteId: string; formData: Record<string, any> }
+    >({
+      query: ({ noteId, formData }) => ({
+        url: `/note/update/${noteId}`,
+        method: "PUT",
+        body: formData,
+      }),
+      invalidatesTags: (result, error, { noteId }) => [
+        { type: "Note", id: noteId },
+      ],
+    }),
 
 
     // delete selected files
@@ -72,6 +72,20 @@ export const noteApi = api.injectEndpoints({
       }),
       invalidatesTags: (r, e, { id }) => [{ type: "Note", id }],
     }),
+    updateViews: builder.mutation<any, { id: string }>({
+      query: ({ id }) => ({
+        url: `/note/${id}/view`,
+        method: "PATCH",
+      }),
+      invalidatesTags: (r, e, { id }) => [{ type: "Note", id }],
+    }),
+    toggleLikes: builder.mutation<any, { id: string}>({
+      query: ({ id }) => ({
+        url: `/note/${id}/like`,
+        method: "PATCH",
+      }),
+      invalidatesTags: (r, e, { id }) => [{ type: "Note", id }],
+    }),
 
   }),
 
@@ -87,6 +101,9 @@ export const {
   useGetNotesQuery,
   useGetNoteByIdQuery,
   useUpdateNoteSettingsMutation,
+  // reactions
+  useToggleLikesMutation,
+  useUpdateViewsMutation
 } = noteApi;
 
 export default noteApi;

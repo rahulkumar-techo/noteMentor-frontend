@@ -9,7 +9,7 @@
  * - Clean state and Zod validation
  */
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -51,13 +51,15 @@ interface NoteUploadFormProps {
     pdfs: File[]
   ) => void;
   isUploading?: boolean;
-  progressValue: number
+  progressValue: number;
+  isSaved:boolean;
 }
 
 export default function NoteUploadForm({
   onSubmit,
   isUploading = false,
-  progressValue = 0
+  progressValue = 0,
+  isSaved
 }: NoteUploadFormProps) {
 
   const [thumbnail, setThumbnail] = useState<File | null>(null);
@@ -79,6 +81,16 @@ export default function NoteUploadForm({
       pdfs: [],
     },
   });
+
+useEffect(() => {
+  if (isSaved) {
+    form.reset();
+    setThumbnail(null);
+    setImageFiles([]);
+    setPdfFiles([]);
+  }
+}, [isSaved]);
+
 
   // --------------------------
   //  HANDLE THUMBNAIL

@@ -13,7 +13,7 @@ import { useUploadNoteMutation } from "@/feature/note/noteApi";
 
 export default function UploadNotePage() {
   const cloud = useCloudinaryUpload();
-  const [uploadNote, { isLoading: saving, data: saved }] = useUploadNoteMutation();
+  const [uploadNote, { isLoading: saving, data: saved,isSuccess:isSaved }] = useUploadNoteMutation();
 
   // NEW: current file + queue
   const [currentFile, setCurrentFile] = useState<string>("");
@@ -103,6 +103,7 @@ export default function UploadNotePage() {
               progressValue={cloud.progress}
               isUploading={cloud.loading || saving}
               onSubmit={handleUpload}
+             isSaved={isSaved}
             />
           </div>
 
