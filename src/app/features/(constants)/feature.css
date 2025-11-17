@@ -1,0 +1,22 @@
+/* Spotlight Cursor */
+.spotlight {
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 70%);
+  mix-blend-mode: screen;
+  z-index: 20;
+  transform: translate(-50%, -50%);
+}
+
+/* Particle Base Style */
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 215, 0, 0.5);
+  pointer-events: none;
+}
