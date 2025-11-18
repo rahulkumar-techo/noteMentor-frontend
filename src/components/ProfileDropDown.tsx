@@ -1,12 +1,5 @@
 "use client";
 
-/**
- * ProfileDropdown.tsx
- * ------------------------------------------------------
- * - Custom avatar dropdown (no Shadcn Avatar dependency)
- * - Displays user info & menu items
- * - Uses shared LogoutAction component
- */
 
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
@@ -76,7 +69,7 @@ export default function ProfileDropdown({ user }: { user?: UserInfo }) {
               />
             ) : (
               <div
-                className={`flex items-center justify-center w-full h-full text-white text-sm font-semibold bg-gradient-to-tr ${color}`}
+                className={`flex items-center justify-center w-full h-full text-white text-sm font-semibold bg-linear-to-tr ${color}`}
               >
                 {initials}
               </div>
@@ -89,7 +82,7 @@ export default function ProfileDropdown({ user }: { user?: UserInfo }) {
       <DropdownMenuContent
         align="end"
         sideOffset={8}
-        className="w-56 rounded-xl border border-white/10 bg-white/10 backdrop-blur-md shadow-lg text-sm"
+        className="w-56 rounded-xl border border-white/10  bg-black backdrop-blur-md shadow-lg text-sm"
       >
         {/* 🧠 User Info */}
         <div className="px-4 py-3 border-b border-white/10">

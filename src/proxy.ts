@@ -8,12 +8,17 @@ export async function proxy(request: NextRequest) {
     const response = await fetch("http://localhost:5000/me", {
       method: "GET",
       headers: {
-        cookie, 
+        cookie,
       },
     });
 
     if (!response.ok) {
       return NextResponse.redirect(new URL("/login", request.url));
+    }
+    const user = await response?.json();
+
+    if (user && !user?.data?.isProfileComplete) {
+      return NextResponse.redirect(new URL("/complete-profile", request.url));
     }
 
     return NextResponse.next();

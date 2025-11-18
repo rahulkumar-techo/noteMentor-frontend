@@ -1,11 +1,4 @@
-/**
- * NoteMentor Dashboard Page
- * Description:
- * - Displays a clean, modern dashboard for NoteMentor users
- * - Includes a progress overview section with circular stats
- * - Showcases multiple NoteCard components for different subjects and activities
- * - Fully responsive layout with dark mode & hover animations
- */
+
 
 "use client"
 
@@ -68,8 +61,8 @@ const DashboardPage = () => {
   ]
 
   return (
-<div className="min-h-screen w-full dark:bg-[#0d0d0f] py-10 px-6 md:px-12 transition-colors duration-300">
 
+    <div className="min-h-screen w-full dark:bg-[#0d0d0f] py-10 px-6 md:px-12 transition-colors duration-300">
       {/* Header */}
       <header className="mb-10 text-center">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-[#FFD700] tracking-wide">
@@ -86,26 +79,9 @@ const DashboardPage = () => {
         {stats.map((stat, i) => (
           <div key={i} className="flex flex-col items-center">
             <div className="relative w-24 h-24">
-              <svg className="w-full h-full -rotate-90">
-                <circle
-                  cx="48"
-                  cy="48"
-                  r="40"
-                  stroke="currentColor"
-                  strokeWidth="8"
-                  className="text-gray-300 dark:text-gray-700"
-                  fill="transparent"
-                />
-                <circle
-                  cx="48"
-                  cy="48"
-                  r="40"
-                  stroke="currentColor"
-                  strokeWidth="8"
-                  strokeDasharray={`${stat.value * 2.5}, 251`}
-                  className={`${stat.color} transition-all duration-700`}
-                  fill="transparent"
-                />
+              <svg className="w-full h-full -rotate-90" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="8" className="text-gray-300 dark:text-gray-700" fill="transparent" />
+                <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="8" strokeDasharray={`${stat.value * 2.5}, 251`} className={`${stat.color} transition-all duration-700`} fill="transparent" />
               </svg>
               <span className="absolute inset-0 flex items-center justify-center font-bold text-lg dark:text-white">
                 {stat.value}%
@@ -117,22 +93,9 @@ const DashboardPage = () => {
       </section>
 
       {/* Grid of Cards */}
-      <section
-        className="
-          grid
-          sm:grid-cols-2
-          lg:grid-cols-3
-          xl:grid-cols-4
-          gap-6
-          place-items-center
-          px-2
-        "
-      >
+      <section className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 place-items-center px-2">
         {cards.map((card, index) => (
-          <div
-            key={index}
-            className="w-full max-w-md hover:-translate-y-1 transition-transform duration-300"
-          >
+          <div key={index} className="w-full max-w-md hover:-translate-y-1 transition-transform duration-300">
             <NoteCard
               title={card.title}
               description={card.description}

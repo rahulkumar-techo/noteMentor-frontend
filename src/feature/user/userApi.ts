@@ -54,6 +54,16 @@ export const userApi = api.injectEndpoints({
       }),
       // invalidatesTags: ["User"],
     }),
+    complete_profile: builder.mutation({
+      query: (data) => ({
+        url: "/api/user/complete-profile",
+        method: "PUT",
+        body: data,
+        credentials: "include",
+      }),
+      invalidatesTags: ["User"],
+    }),
+
   }),
 });
 
@@ -61,4 +71,6 @@ export const { useGetUserQuery,
   useUpdateAcademicMutation,
   useUpdateDeviceMutation,
   useUpdatePersonalizationMutation,
-  useLogoutMutation } = userApi
+  useLogoutMutation,
+useComplete_profileMutation
+} = userApi

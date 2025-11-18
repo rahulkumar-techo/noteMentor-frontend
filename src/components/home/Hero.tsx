@@ -36,8 +36,7 @@ export default function Hero() {
               Live demo — convert notes
             </p>
 
-            <div className="h-56 rounded-md 
-            flex items-center justify-center overflow-hidden">
+            <div className="h-56 rounded-md flex items-center justify-center overflow-hidden">
 
               <Image
                 src="/hero.png"

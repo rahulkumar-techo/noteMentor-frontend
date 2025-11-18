@@ -4,11 +4,13 @@
 import React from "react";
 import NoteForm from "@/app/dashboard/create-questions/(components)/NoteForm";
 import DisplayData from "@/app/dashboard/create-questions/(components)/DisplayData";
+import ProtectedRoute from "@/components/security/ProtectRoute";
 
 const Page = () => {
   return (
-    <div
-      className="
+    <ProtectedRoute allowedRoles={["instructor"]}>
+      <div
+        className="
         w-full 
         h-screen            
         grid 
@@ -17,10 +19,10 @@ const Page = () => {
         gap-1 lg:gap-4       
         transition-all duration-300
       "
-    >
-      {/* Left Column - NoteForm */}
-      <div
-        className="
+      >
+        {/* Left Column - NoteForm */}
+        <div
+          className="
           h-full 
           flex 
           justify-center 
@@ -31,13 +33,13 @@ const Page = () => {
           lg:scrollbar-hide
           bg-transparent
         "
-      >
-        <NoteForm />
-      </div>
+        >
+          <NoteForm />
+        </div>
 
-      {/* Right Column - DisplayData */}
-      <div
-        className="
+        {/* Right Column - DisplayData */}
+        <div
+          className="
           h-full 
           flex 
           justify-center 
@@ -48,10 +50,12 @@ const Page = () => {
           lg:scrollbar-hide
           bg-transparent
         "
-      >
-        <DisplayData />
+        >
+          <DisplayData />
+        </div>
       </div>
-    </div>
+    </ProtectedRoute>
+
   );
 };
 

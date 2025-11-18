@@ -67,7 +67,7 @@ export const noteApi = api.injectEndpoints({
     updateNoteSettings: builder.mutation<any, { id: string; settings: any }>({
       query: ({ id, settings }) => ({
         url: `/note/settings/${id}`,
-        method: "PUT",
+        method: "PATCH",
         body: settings,
       }),
       invalidatesTags: (r, e, { id }) => [{ type: "Note", id }],
