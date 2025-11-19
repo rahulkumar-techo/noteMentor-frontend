@@ -1,17 +1,16 @@
-"use client";
-
-export default function ThreadConnector() {
+export default function ReplyArrow() {
   return (
     <svg
-      width="24"
-      height="30"
-      className="absolute left-0 top-0 hidden sm:block pointer-events-none"
+      width="22"
+      height="26"
+      className="absolute left-0 top-0 text-neutral-500"
     >
       <path
-        d="M12 0 L12 15 Q12 30 24 30"
-        stroke="#666"
+        d="M10 0 L10 14 Q10 20 18 20"
+        stroke="currentColor"
         strokeWidth="2"
         fill="none"
+        strokeLinecap="round"
       />
     </svg>
   );

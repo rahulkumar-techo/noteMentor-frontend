@@ -1,8 +1,10 @@
 "use client";
 
 import { useSelector } from "react-redux";
-import CommentContentItem from "../CommentContentItem";
+import { useState } from "react";
 import { RootState } from "@/app/store";
+import CommentContentItem from "../CommentContentItem";
+import ReplyArrow from "./ThreadLine";
 
 export default function CommentThreadItem({
   comment,
@@ -11,57 +13,82 @@ export default function CommentThreadItem({
   onReply,
   onEdit,
   onDelete,
+  scrollToParent,
+  registerRef,
 }: any) {
   const user = useSelector((state: RootState) => state.user.user);
+  const [expanded, setExpanded] = useState(true);
 
-  const isRoot = level === 0;
-  const isSameUserAsParent = parentUserId === comment.userId?._id;
+  // ⭐ Only allow two visible levels
+  const displayLevel = level === 0 ? 0 : 1;
 
-  // Desktop indent ONLY if NOT same user
-  const desktopIndent = isSameUserAsParent ? "ml-0" : "ml-8";
+  // ⭐ Same user replying = no extra indent
+  const sameUser = parentUserId === comment.userId?._id;
 
-  // Mobile indent: smaller, unless same user
-  const mobileIndent = isSameUserAsParent ? "ml-0" : "ml-4";
+  const showArrow = displayLevel === 1 && !sameUser;
 
   return (
-    <div className="flex mt-4">
+    <div
+      className="relative mt-4"
+      style={{
+        paddingLeft: displayLevel === 1 && !sameUser ? 26 : 0,
+      }}
+      ref={
+        registerRef
+          ? (ref) => registerRef(comment._id, { current: ref })
+          : undefined
+      }
+    >
 
-      {/* Vertical Line (Desktop Only) */}
-      {!isRoot && !isSameUserAsParent && (
-        <div className="hidden sm:block">
-          <div className="w-[2px] bg-neutral-700 dark:bg-neutral-600 h-full mr-3"></div>
+      {/* ⭐ Instagram-style reply arrow */}
+      {showArrow && (
+        <div className="absolute left-0 top-1 hidden sm:block">
+          <ReplyArrow />
         </div>
       )}
 
-      {/* MAIN COMMENT AREA */}
-      <div className="flex-1">
-        <CommentContentItem
-          comment={comment}
-          level={level}
-          onReply={onReply}
-          onEdit={onEdit}
-          onDelete={onDelete}
-          isMobile={false}
-          currentUserId={user?._id}
-        />
+      {/* COMMENT BLOCK */}
+      <CommentContentItem
+        comment={comment}
+        level={displayLevel}
+        currentUserId={user?._id}
+        onReply={onReply}
+        onEdit={onEdit}
+        onDelete={onDelete}
+        scrollToParent={scrollToParent}
+      />
 
-        {/* CHILDREN */}
-        {comment.replies?.length > 0 && (
-          <div className={`${mobileIndent} sm:${desktopIndent} mt-3`}>
-            {comment.replies.map((child: any) => (
-              <CommentThreadItem
-                key={child._id}
-                comment={child}
-                level={level + 1}
-                parentUserId={comment.userId?._id}  // pass parent for comparison
-                onReply={onReply}
-                onEdit={onEdit}
-                onDelete={onDelete}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+      {/* ⭐ CHILDREN (Flatten after level-1) */}
+      {comment.replies?.length > 0 && (
+        <>
+          <button
+            className="text-xs text-blue-500 mt-1 mb-1 ml-1"
+            onClick={() => setExpanded(!expanded)}
+          >
+            {expanded
+              ? "Hide replies"
+              : `View ${comment.replies.length} replies`}
+          </button>
+
+          {expanded && (
+            <div className="mt-2">
+              {comment.replies.map((child: any) => (
+                <CommentThreadItem
+                  key={child._id}
+                  comment={child}
+                  level={1} // ⭐ ALWAYS flatten
+                  parentUserId={comment.userId?._id}
+                  onReply={onReply}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                  scrollToParent={scrollToParent}
+                  registerRef={registerRef}
+                />
+              ))}
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
