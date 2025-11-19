@@ -63,7 +63,7 @@ export default function CommentContentItem({
 
         {/* ⭐ Text or Edit Form */}
         {!openEdit ? (
-          <p className="text-sm mt-2 whitespace-pre-wrap break-words">
+          <p className="text-sm mt-2 whitespace-pre-wrap wrap-break-word">
             {comment.message}
           </p>
         ) : (
