@@ -1,13 +1,15 @@
 
 import { configureStore } from "@reduxjs/toolkit";
 import api from "@/feature/mainApi";
-import userReducer from "@/feature/user/user.slice"
+import userReducer from "@/feature/user/user.slice";
+import analyticsReducer from "@/feature/analytics/analytics.slice"
 
 export const store = configureStore({
   reducer: {
 
     [api.reducerPath]: api.reducer,
-     user: userReducer
+     user: userReducer,
+     analytics: analyticsReducer
   },
 
   middleware: (getDefaultMiddleware) =>

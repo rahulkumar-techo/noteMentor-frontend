@@ -53,7 +53,7 @@ const navItemsByRole: any = {
   ],
 
   admin: [
-    { icon: Home, label: "Admin Panel", href: "/dashboard" },
+    { icon: Home, label: "Admin Panel", href: "/dashboard/admin/overview" },
     { icon: Users, label: "Users", href: "/dashboard/admin/users" },
     { icon: Shield, label: "Roles & Permissions", href: "/dashboard/admin/role-permissions" },
     { icon: Settings, label: "System Settings", href: "/dashboard/admin/settings" },

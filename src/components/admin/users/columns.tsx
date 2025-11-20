@@ -1,27 +1,28 @@
-// columns.tsx
-"use client"
+"use client";
 
-import { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown, MoreHorizontal } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+import { ColumnDef } from "@tanstack/react-table";
+import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu"
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-export type Payment = {
-  id: string
-  amount: number
-  status: "pending" | "processing" | "success" | "failed"
-  email: string
-}
+export type User = {
+  _id: string;
+  fullname: string;
+  email: string;
+  role: string;
+  createdAt: string;
+};
 
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<User>[] = [
+  // Select Checkbox
   {
     id: "select",
     header: ({ table }) => (
@@ -45,16 +46,9 @@ export const columns: ColumnDef<Payment>[] = [
     enableHiding: false,
   },
 
+  // Fullname
   {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("status")}</div>
-    ),
-  },
-
-  {
-    accessorKey: "email",
+    accessorKey: "fullname",
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -62,34 +56,47 @@ export const columns: ColumnDef<Payment>[] = [
           column.toggleSorting(column.getIsSorted() === "asc")
         }
       >
-        Email
+        Fullname
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
+  },
+
+  // Email
+  {
+    accessorKey: "email",
+    header: "Email",
     cell: ({ row }) => (
-      <div className="lowercase">{row.getValue("email")}</div>
+      <span className="lowercase">{row.getValue("email")}</span>
     ),
   },
 
+  // Role
   {
-    accessorKey: "amount",
-    header: () => <div className="text-right">Amount</div>,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"))
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount)
+    accessorKey: "role",
+    header: "Role",
+    cell: ({ row }) => (
+      <span className="capitalize">{row.getValue("role")}</span>
+    ),
+  },
 
-      return <div className="text-right font-medium">{formatted}</div>
+  // Created At
+  {
+    accessorKey: "createdAt",
+    header: "Joined",
+    cell: ({ row }) => {
+      const date = new Date(row.getValue("createdAt"));
+      return <span>{date.toLocaleDateString()}</span>;
     },
   },
 
+  // Actions Dropdown
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const payment = row.original
+      const user = row.original;
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -99,21 +106,28 @@ export const columns: ColumnDef<Payment>[] = [
           </DropdownMenuTrigger>
 
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>User Actions</DropdownMenuLabel>
 
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
+              onClick={() => navigator.clipboard.writeText(user.email)}
             >
-              Copy ID
+              Copy Email
             </DropdownMenuItem>
 
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem>View user</DropdownMenuItem>
-            <DropdownMenuItem>View details</DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => console.log("View user", user._id)}
+            >
+              View Details
+            </DropdownMenuItem>
+
+            <DropdownMenuItem className="text-red-600">
+              Delete User
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      )
+      );
     },
   },
-]
+];

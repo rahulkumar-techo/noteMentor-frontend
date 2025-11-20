@@ -9,26 +9,34 @@ import { StatsGrid } from "./StatsGrid";
 import { TopSubjects } from "./TopSubjects";
 import { Separator } from "@/components/ui/separator";
 
-export default function NoteMentorOverview() {
+export type OverviewType = {
+    users: any;
+    notes: any;
+    matrix: any;
+};
 
-    // get all users;
-
-    // get all notes;
+export default function NoteMentorOverview({ users, notes, matrix }: Partial<OverviewType>) {
 
     return (
         <div className="p-4 sm:p-6 lg:p-10 max-w-[1400px] mx-auto w-full">
-            <OverviewHeader />
+            <OverviewHeader users={users} notes={notes} />
             <main className="grid grid-cols-1 lg:grid-cols-4 gap-6 w-full">
                 <section className="lg:col-span-3 space-y-6">
-                    <StatsGrid />
-                    <MonthlyActivity />
+                    <StatsGrid
+                        users={users}
+                        notes={notes}
+                        matrix={matrix}
+                    />
+
+                    <MonthlyActivity matrix={matrix} />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <TopSubjects />
-                        <RecentUsers />
+                        <RecentUsers users={users} />
+
                     </div>
                 </section>
                 <aside className="lg:col-span-1 space-y-6">
-                    <QuickActions />
+                    <QuickActions users={users} notes={notes} />
                     <FiltersPanel />
                     <SearchUsers />
                 </aside>

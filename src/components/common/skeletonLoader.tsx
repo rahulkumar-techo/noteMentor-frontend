@@ -4,14 +4,16 @@ import React from "react";
 import { Card } from "../ui/card";
 
 interface NoteSkeletonProps {
-  type?: "page" | "cards";
+  type?: "page" | "cards" | "table" | "overview";
   count?: number;
 }
 
 const NoteSkeleton: React.FC<NoteSkeletonProps> = ({ type = "page", count = 5 }) => {
   const items = Array.from({ length: count });
 
-  // 🦴 DETAILS PAGE SKELETON
+  /* -----------------------------------------------------
+     1️⃣ PAGE SKELETON (Detailed View)
+  ----------------------------------------------------- */
   if (type === "page") {
     return (
       <main className="min-h-screen w-full text-white px-4 md:px-8 py-10 animate-pulse">
@@ -54,7 +56,6 @@ const NoteSkeleton: React.FC<NoteSkeletonProps> = ({ type = "page", count = 5 })
             </div>
           </div>
 
-          {/* Back Button */}
           <div className="flex justify-center pt-8">
             <div className="h-10 w-40 bg-gray-300 dark:bg-gray-700 rounded-lg" />
           </div>
@@ -63,29 +64,83 @@ const NoteSkeleton: React.FC<NoteSkeletonProps> = ({ type = "page", count = 5 })
     );
   }
 
-  // 🧩 CARDS GRID SKELETON
-  return (
-    <Card className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 justify-between w-full animate-pulse">
-      {items.map((_, i) => (
-        <div
-          key={i}
-          className="bg-white/10 dark:bg-gray-900/30 border border-gray-800 backdrop-blur-md rounded-2xl p-4 space-y-3"
-        >
-          {/* Thumbnail */}
-          <div className="h-40 bg-gray-300 dark:bg-gray-700 rounded-xl" />
-          {/* Title */}
-          <div className="h-4 w-3/4 bg-gray-300 dark:bg-gray-700 rounded" />
-          {/* Description */}
-          <div className="h-3 w-1/2 bg-gray-300 dark:bg-gray-700 rounded" />
-          {/* Footer actions */}
-          <div className="flex gap-2 pt-2">
-            <div className="h-8 w-16 bg-gray-300 dark:bg-gray-700 rounded-lg" />
-            <div className="h-8 w-10 bg-gray-300 dark:bg-gray-700 rounded-lg" />
+  /* -----------------------------------------------------
+     2️⃣ CARDS GRID SKELETON
+  ----------------------------------------------------- */
+  if (type === "cards") {
+    return (
+      <Card className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full animate-pulse p-4">
+        {items.map((_, i) => (
+          <div
+            key={i}
+            className="bg-white/10 dark:bg-gray-900/30 border border-gray-800 rounded-2xl p-4 space-y-3"
+          >
+            <div className="h-40 bg-gray-300 dark:bg-gray-700 rounded-xl" />
+            <div className="h-4 w-3/4 bg-gray-300 dark:bg-gray-700 rounded" />
+            <div className="h-3 w-1/2 bg-gray-300 dark:bg-gray-700 rounded" />
+            <div className="flex gap-2 pt-2">
+              <div className="h-8 w-16 bg-gray-300 dark:bg-gray-700 rounded-lg" />
+              <div className="h-8 w-10 bg-gray-300 dark:bg-gray-700 rounded-lg" />
+            </div>
           </div>
+        ))}
+      </Card>
+    );
+  }
+
+  /* -----------------------------------------------------
+     3️⃣ TABLE SKELETON (Users/Notes)
+  ----------------------------------------------------- */
+  if (type === "table") {
+    return (
+      <div className="w-full border rounded-lg overflow-hidden animate-pulse">
+        {/* Header */}
+        <div className="h-10 bg-gray-200 dark:bg-gray-800" />
+        
+        {/* Rows */}
+        {items.map((_, i) => (
+          <div
+            key={i}
+            className="border-t h-12 w-full flex items-center px-4 gap-4 bg-gray-100 dark:bg-gray-900"
+          >
+            <div className="h-4 w-6 bg-gray-300 dark:bg-gray-700 rounded" />
+            <div className="h-4 w-32 bg-gray-300 dark:bg-gray-700 rounded" />
+            <div className="h-4 w-40 bg-gray-300 dark:bg-gray-700 rounded" />
+            <div className="h-4 w-20 bg-gray-300 dark:bg-gray-700 rounded" />
+            <div className="ml-auto h-6 w-6 bg-gray-300 dark:bg-gray-700 rounded" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  /* -----------------------------------------------------
+     4️⃣ ADMIN OVERVIEW SKELETON (Stats + Chart + Panels)
+  ----------------------------------------------------- */
+  if (type === "overview") {
+    return (
+      <div className="animate-pulse space-y-8 p-4">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-24 bg-gray-300 dark:bg-gray-700 rounded-xl" />
+          ))}
         </div>
-      ))}
-    </Card>
-  );
+
+        {/* Chart */}
+        <div className="h-64 bg-gray-300 dark:bg-gray-700 rounded-xl" />
+
+        {/* Two Panels */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="h-40 bg-gray-300 dark:bg-gray-700 rounded-xl" />
+          <div className="h-40 bg-gray-300 dark:bg-gray-700 rounded-xl" />
+        </div>
+      </div>
+    );
+  }
+
+  // Default return
+  return null;
 };
 
 export default NoteSkeleton;

@@ -1,16 +1,30 @@
-import { columns } from "@/components/admin/users/columns"
-import { DataTable } from "@/components/admin/users/data-table"
+"use client";
 
-
-const data: any = [
-  { id: "1", email: "test@example.com", amount: 200, status: "success" },
-  { id: "2", email: "rahul@example.com", amount: 300, status: "processing" },
-]
+import { columns } from "@/components/admin/users/columns";
+import { DataTable } from "@/components/admin/users/data-table";
+import { useAllUsersQuery } from "@/feature/user/adminProtectedApi";
+import { useSelector } from "react-redux";
+import NoteSkeleton from "@/components/common/skeletonLoader";
 
 export default function Page() {
+  const search = useSelector((state: any) => state.analytics.search);
+  const page = useSelector((state: any) => state.analytics.usersPage);
+  const limit = useSelector((state: any) => state.analytics.usersLimit);
+
+  const { data, isLoading, error } = useAllUsersQuery({
+    page,
+    limit,
+    search,
+  });
+
+  const users = data?.data?.data || [];
+
+  if (isLoading) return <NoteSkeleton type="table" />;
+  if (error) return <div className="text-red-500">Failed to load users</div>;
+
   return (
     <div className="p-4">
-      <DataTable columns={columns} data={data} />
+      <DataTable columns={columns} data={users} />
     </div>
-  )
+  );
 }

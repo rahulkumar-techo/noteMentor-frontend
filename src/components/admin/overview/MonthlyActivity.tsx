@@ -1,56 +1,83 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { motion } from "framer-motion";
+"use client";
 
-export function MonthlyActivity() {
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+import {
+  LineChart,
+  Line,
+  XAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+  Legend,
+} from "recharts";
 
-    return (
-        <Card className="rounded-2xl p-4 w-full">
-            <CardHeader className="p-0 mb-4">
-                <CardTitle className="text-base sm:text-lg">
-                    Monthly Activity
-                </CardTitle>
-            </CardHeader>
+import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 
-            <CardContent className="p-0">
-                
-                {/* Chart Wrapper (scrollable on extra-small screens) */}
-                <div className="w-full overflow-x-auto scrollbar-none">
-                    <div className="min-w-[600px] sm:min-w-0 h-40 sm:h-48 md:h-56 
-                                    rounded-lg bg-gradient-to-r from-slate-50 to-white 
-                                    shadow-inner flex items-end gap-2 p-4">
-                        
-                        {months.map((m, i) => {
-                            const height = Math.max(6, Math.round(Math.sin(i + 1) * 40 + 50));
+export function MonthlyActivity({ matrix }: any) {
+  if (!matrix || !Array.isArray(matrix.matrix)) return null;
 
-                            return (
-                                <div key={m} className="flex-1 flex flex-col items-center gap-1">
-                                    <div className="w-full flex items-end h-[80px] sm:h-[100px] md:h-[120px]">
-                                        <motion.div
-                                            className="w-full rounded-xl"
-                                            style={{ height: `${height}%` }}
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            transition={{ duration: 0.4 + i * 0.02 }}
-                                        >
-                                            <div className="h-full w-full bg-gradient-to-t 
-                                                            from-indigo-500 via-indigo-400 to-indigo-300 
-                                                            rounded-xl" 
-                                            />
-                                        </motion.div>
-                                    </div>
+  // Month Names
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-                                    {/* Month Label */}
-                                    <span className="text-[10px] sm:text-xs text-muted-foreground mt-1">
-                                        {m}
-                                    </span>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
+  // Convert backend matrix → chart-friendly format
+  const chartData = matrix.matrix.map((m: any) => ({
+    month: monthNames[m.month - 1],
+    usersRegistered: m.usersRegistered,
+    notesCreated: m.notesCreated,
+  }));
 
-            </CardContent>
-        </Card>
-    );
+  return (
+    <Card className="rounded-2xl p-4 w-full">
+      <CardHeader className="p-0 mb-4">
+        <CardTitle className="text-base sm:text-lg">
+          Monthly Activity ({matrix.year})
+        </CardTitle>
+      </CardHeader>
+
+      <CardContent className="p-0">
+        <div className="w-full" style={{ minHeight: "260px" }}>
+          <ResponsiveContainer width="100%" aspect={2.3}>
+            <LineChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+              
+              <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+
+              <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+
+              <Tooltip
+                wrapperStyle={{ zIndex: 30 }}
+                contentStyle={{ borderRadius: "10px", padding: "6px 10px" }}
+              />
+
+              <Legend />
+
+              {/* USERS Registered Line */}
+              <Line
+                type="monotone"
+                dataKey="usersRegistered"
+                name="Users Registered"
+                stroke="#6366F1"       // Indigo
+                strokeWidth={3}
+                dot={{ r: 3 }}
+                activeDot={{ r: 6 }}
+                animationDuration={700}
+              />
+
+              {/* NOTES Created Line */}
+              <Line
+                type="monotone"
+                dataKey="notesCreated"
+                name="Notes Created"
+                stroke="#10B981"       // Green
+                strokeWidth={3}
+                dot={{ r: 3 }}
+                activeDot={{ r: 6 }}
+                animationDuration={700}
+              />
+
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </CardContent>
+    </Card>
+  );
 }
