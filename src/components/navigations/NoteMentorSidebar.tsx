@@ -12,6 +12,7 @@ import {
   X,
   Shield,
   Users,
+  Box,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -54,6 +55,7 @@ const navItemsByRole: any = {
 
   admin: [
     { icon: Home, label: "Admin Panel", href: "/dashboard/admin/overview" },
+    { icon: Box, label: "Metrics", href: "/dashboard/admin/metrics" },
     { icon: Users, label: "Users", href: "/dashboard/admin/users" },
     { icon: Shield, label: "Roles & Permissions", href: "/dashboard/admin/role-permissions" },
     { icon: Settings, label: "System Settings", href: "/dashboard/admin/settings" },

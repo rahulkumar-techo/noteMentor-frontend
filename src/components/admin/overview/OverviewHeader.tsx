@@ -132,7 +132,7 @@ export function OverviewHeader({ users = [], notes = [] }: any) {
                                                 {filteredNotes.map((n: any) => (
                                                     <Link
                                                         key={n._id}
-                                                        href={`/notes/${n._id}`}
+                                                        href={`/note/${n._id}`}
                                                         className=" p-2 rounded-lg bg-white/50 dark:bg-black/30 border shadow-sm hover:bg-primary/10 transition flex gap-2.5 "
                                                     >
                                                         <Image src ={n?.thumbnail?.secure_url} alt="thumbnail" width={50} height={50}/>

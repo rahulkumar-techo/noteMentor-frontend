@@ -13,7 +13,7 @@ import { useUploadNoteMutation } from "@/feature/note/noteApi";
 
 export default function UploadNotePage() {
   const cloud = useCloudinaryUpload();
-  const [uploadNote, { isLoading: saving, data: saved,isSuccess:isSaved }] = useUploadNoteMutation();
+  const [uploadNote, { isLoading: saving, data: saved, isSuccess: isSaved }] = useUploadNoteMutation();
 
   // NEW: current file + queue
   const [currentFile, setCurrentFile] = useState<string>("");
@@ -82,19 +82,19 @@ export default function UploadNotePage() {
 
       {/* UI */}
       <main className="min-h-screen flex items-center justify-center bg-linear-to-b from-black via-[#0a0a0a] to-[#1a1a1a] text-white px-6 mt-0">
-        <section className="w-full max-w-5xl pt-24 md:pt-28 pb-16 space-y-10">
-            {/* Back Button */}
-            <button
-                onClick={() => window.history.back()}
-                className="flex items-center gap-2 text-sm text-blue-600 hover:underline"
-            >
-                ⬅ Back
-            </button>
+        <section className="w-full max-w-5xl   pb-16 space-y-10">
 
           {/* Header */}
           <div className="text-center space-y-2">
             <h1 className="text-3xl md:text-4xl font-semibold text-[#FFD700]">Upload Your Notes</h1>
             <p className="text-sm text-gray-400">Upload images, PDFs, and a thumbnail.</p>
+            {/* Back Button */}
+            <button
+              onClick={() => window.history.back()}
+              className="flex items-center gap-2 text-sm text-blue-600 hover:underline"
+            >
+              ⬅ Back
+            </button>
           </div>
 
           {/* Form */}
@@ -103,7 +103,7 @@ export default function UploadNotePage() {
               progressValue={cloud.progress}
               isUploading={cloud.loading || saving}
               onSubmit={handleUpload}
-             isSaved={isSaved}
+              isSaved={isSaved}
             />
           </div>
 
