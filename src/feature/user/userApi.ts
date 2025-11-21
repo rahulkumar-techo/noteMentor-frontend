@@ -6,7 +6,7 @@ export const userApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getUser: builder.query({
       query: () => ({
-        url: "/me",
+        url: "/api/me",
         method: "GET",
         credentials: "include",   // 👈 REQUIRED
       }),

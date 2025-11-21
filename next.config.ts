@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: "/:path*",
+        source: "/api/:path*",
         destination: "https://notementor.onrender.com/:path*",
       },
     ];
