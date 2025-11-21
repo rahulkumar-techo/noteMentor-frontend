@@ -5,8 +5,9 @@ export async function proxy(request: NextRequest) {
   try {
     // 🔥 Forward cookies to backend (required!)
     const cookie = request.headers.get("cookie") ?? "";
-    const response = await fetch("http://localhost:5000/me", {
+    const response = await fetch("https://notementor.onrender.com/me", {
       method: "GET",
+      credentials:"include",
       headers: {
         cookie,
       },
@@ -16,6 +17,8 @@ export async function proxy(request: NextRequest) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
     const user = await response?.json();
+
+    console.log({"PROXY RESPONSE":response});
 
     if (user && !user?.data?.isProfileComplete) {
       return NextResponse.redirect(new URL("/complete-profile", request.url));

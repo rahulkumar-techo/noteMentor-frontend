@@ -1,13 +1,14 @@
-name: Next.js CI
+name: Next.js CI/CD
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
+    name: 🏗 Build Next.js
     runs-on: ubuntu-latest
 
     steps:
@@ -17,22 +18,21 @@ jobs:
       - name: 🟩 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "25"
+          node-version: "20"
           cache: "npm"
 
       - name: 📦 Install Dependencies
-        run: npm install
+        run: npm ci
 
-      - name: 🧹 Run Lint
+      - name: 🧹 Lint
         run: npm run lint
         continue-on-error: true
 
       - name: 🏗 Build Next.js App
         run: npm run build
 
-      - name: 📁 Upload Production Build (Optional)
+      - name: 📁 Upload Production Build Artifact
         uses: actions/upload-artifact@v4
         with:
           name: nextjs-build
           path: .next/
-          

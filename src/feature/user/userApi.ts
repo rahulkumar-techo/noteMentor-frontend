@@ -5,8 +5,13 @@ import { setUser } from "./user.slice";
 export const userApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getUser: builder.query({
-      query: () => "/me",
+      query: () => ({
+        url: "/me",
+        method: "GET",
+        credentials: "include",   // 👈 REQUIRED
+      }),
       providesTags: ["User"],
+
 
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
@@ -72,5 +77,5 @@ export const { useGetUserQuery,
   useUpdateDeviceMutation,
   useUpdatePersonalizationMutation,
   useLogoutMutation,
-useComplete_profileMutation
+  useComplete_profileMutation
 } = userApi

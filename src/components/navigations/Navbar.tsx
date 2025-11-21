@@ -30,6 +30,8 @@ export default function Navbar() {
 
   const user = data?.data || data?.user || data || null;
 
+  console.log({user})
+
   /* ------------------------------------
         Determine whether to hide navbar
   --------------------------------------- */
