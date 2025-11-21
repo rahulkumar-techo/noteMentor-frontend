@@ -6,7 +6,7 @@ import { FcGoogle } from "react-icons/fc";
 import { Button } from "@/components/ui/button";
 
 export default function LoginPage() {
-  const backendUrl = process.env.NEXT_PUBLIC_API_URL||"https://notementor.onrender.com"
+  const backendUrl = "https://notementor.onrender.com"
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center  text-white relative overflow-hidden">

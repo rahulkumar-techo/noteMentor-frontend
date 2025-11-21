@@ -5,46 +5,23 @@ const nextConfig: NextConfig = {
 
   images: {
     remotePatterns: [
-      // Google OAuth images
-      {
-        protocol: "https",
-        hostname: "lh3.googleusercontent.com",
-      },
-
-      // Cloudinary uploads
-      {
-        protocol: "https",
-        hostname: "res.cloudinary.com",
-      },
-
-      // Unsplash dummy images
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com",
-      },
-
-      // Lorem Picsum placeholders
-      {
-        protocol: "https",
-        hostname: "picsum.photos",
-      },
-
-      // Upstash placeholder API (dummy)
-      {
-        protocol: "https",
-        hostname: "api.upstash.app",
-      },
-
-      // placehold.co for UI mockups
-      {
-        protocol: "https",
-        hostname: "placehold.co",
-      },
-      {
-        protocol: "https",
-        hostname: "cdn.simpleicons.org", // ✔ add this
-      },
+      { protocol: "https", hostname: "lh3.googleusercontent.com" },
+      { protocol: "https", hostname: "res.cloudinary.com" },
+      { protocol: "https", hostname: "images.unsplash.com" },
+      { protocol: "https", hostname: "picsum.photos" },
+      { protocol: "https", hostname: "api.upstash.app" },
+      { protocol: "https", hostname: "placehold.co" },
+      { protocol: "https", hostname: "cdn.simpleicons.org" },
     ],
+  },
+
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: "https://notementor.onrender.com/:path*",
+      },
+    ];
   },
 };
 
