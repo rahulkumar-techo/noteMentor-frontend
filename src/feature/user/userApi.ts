@@ -43,7 +43,7 @@ export const userApi = api.injectEndpoints({
     }),
     updateDevice: builder.mutation({
       query: (data) => ({
-        url: "/user/settings",
+        url: "/api/user/settings",
         method: "PUT",
         body: data,
         credentials: "include",
@@ -52,7 +52,7 @@ export const userApi = api.injectEndpoints({
     }),
     logout: builder.mutation({
       query: () => ({
-        url: "/logout",
+        url: "/api/logout",
         method: "POST",
 
         credentials: "include",

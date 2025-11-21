@@ -6,6 +6,7 @@ import { store } from "@/app/store";
 import Navbar from "@/components/navigations/Navbar";
 import { Toaster } from "react-hot-toast";
 import { ThemeProvider } from "../settings/theme-provider";
+import ProtectedPage from "../wrappers/ProtectedPage";
 
 export default function ClientProvider({ children }: { children: React.ReactNode }) {
   return (
@@ -19,7 +20,9 @@ export default function ClientProvider({ children }: { children: React.ReactNode
         {/* Navbar decides internally whether to hide on certain routes */}
         <Navbar />
         <Toaster />
-        {children}
+       <ProtectedPage>
+         {children}
+       </ProtectedPage>
       </Provider>
     </ThemeProvider>
   );
