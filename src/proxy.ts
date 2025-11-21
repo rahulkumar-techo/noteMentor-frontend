@@ -5,7 +5,7 @@ export async function proxy(request: NextRequest) {
   try {
     // 🔥 Forward cookies to backend (required!)
     const cookie = request.headers.get("cookie") ?? "";
-    const response = await fetch("https://notementor.onrender.com//api/me", {
+    const response = await fetch("https://notementor.onrender.com/api/me", {
       method: "GET",
       credentials:"include",
       headers: {
