@@ -8,12 +8,7 @@ const Footer = () => {
           {/* Logo */}
           <div className="flex items-center gap-3">
             <div
-              className="
-                h-10 w-10 rounded-md 
-                bg-yellow-600 dark:bg-yellow-500
-                flex items-center justify-center 
-                text-white font-bold shadow-sm
-              "
+              className=" h-10 w-10 rounded-md  bg-yellow-600 dark:bg-yellow-500 flex items-center justify-center  text-white font-bold shadow-sm "
             >
               NM
             </div>

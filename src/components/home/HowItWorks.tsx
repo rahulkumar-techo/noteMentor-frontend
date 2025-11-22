@@ -18,21 +18,11 @@ export function HowItWorks() {
         {steps.map((s, i) => (
           <div
             key={s.title}
-            className="
-              p-6 rounded-xl border 
-              bg-white dark:bg-neutral-800 
-              border-gray-200 dark:border-neutral-700
-              shadow-sm hover:shadow-md 
-              hover:border-yellow-500 dark:hover:border-yellow-500
-              transition-all cursor-default
-            "
+            className="p-6 rounded-xl border bg-white dark:bg-neutral-800 border-gray-200 dark:border-neutral-700shadow-sm hover:shadow-md hover:border-yellow-500 dark:hover:border-yellow-500transition-all cursor-default"
           >
             {/* Step Number */}
             <div
-              className="
-                text-yellow-600 dark:text-yellow-400 
-                font-bold text-xl tracking-wide
-              "
+              className=" text-yellow-600 dark:text-yellow-400 font-bold text-xl tracking-wide"
             >
               {String(i + 1).padStart(2, "0")}
             </div>

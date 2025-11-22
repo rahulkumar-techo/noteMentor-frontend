@@ -1,13 +1,21 @@
+/**
+ * ⚡ ESLint Config (MJS) for Next.js + TypeScript
+ * - Clean + ESM compatible
+ * - Allows any
+ * - Disables noisy React Compiler rules
+ * - Custom global ignores
+ */
 
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 
 export default defineConfig([
+  // Next.js base configs
   ...nextVitals,
   ...nextTs,
 
-  // Custom global ignores
+  // Custom ignored paths
   globalIgnores([
     ".next/**",
     "out/**",
@@ -15,20 +23,17 @@ export default defineConfig([
     "next-env.d.ts",
   ]),
 
+  // Custom rules
   {
     rules: {
-      // allow any
       "@typescript-eslint/no-explicit-any": "off",
-
-      // warn unused vars
       "@typescript-eslint/no-unused-vars": "warn",
 
-      // disable strict react compiler rules
+      // Disable strict React Compiler warnings
       "react-hooks/set-state-in-effect": "off",
       "react-hooks/preserve-manual-memoization": "off",
       "react-hooks/purity": "off",
 
-      // allow <img>
       "@next/next/no-img-element": "off",
     },
   },

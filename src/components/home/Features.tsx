@@ -19,13 +19,7 @@ export function Features() {
         {items.map((it) => (
           <div
             key={it.title}
-            className="
-              rounded-xl p-6 
-              bg-white dark:bg-neutral-800 
-              border border-gray-200 dark:border-neutral-700
-              shadow-sm hover:shadow-md hover:border-indigo-500 dark:hover:border-indigo-400
-              transition-all
-            "
+            className=" rounded-xl p-6  bg-white dark:bg-neutral-800  border border-gray-200 dark:border-neutral-700 shadow-sm hover:shadow-md hover:border-indigo-500 dark:hover:border-indigo-400 transition-all "
           >
             <h4 className="font-semibold text-gray-900 dark:text-white">{it.title}</h4>
             <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">{it.desc}</p>

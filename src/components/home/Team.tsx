@@ -30,23 +30,11 @@ export function Team() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.15, duration: 0.4 }}
             viewport={{ once: true }}
-            className="
-              rounded-xl p-6 text-center 
-              bg-white dark:bg-neutral-800 
-              border border-gray-200 dark:border-neutral-700
-              shadow-sm hover:shadow-lg 
-              hover:border-indigo-500 dark:hover:border-indigo-400
-              transition-all
-            "
+            className="rounded-xl p-6 text-center bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700shadow-sm hover:shadow-lg hover:border-indigo-500 dark:hover:border-indigo-400transition-all"
           >
             {/* Avatar */}
             <div
-              className="
-                mx-auto h-20 w-20 rounded-full 
-                bg-indigo-100 dark:bg-indigo-900/40 
-                flex items-center justify-center 
-                text-2xl font-bold text-indigo-600 dark:text-indigo-400
-              "
+              className="mx-auto h-20 w-20 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center text-2xl font-bold text-indigo-600 dark:text-indigo-400"
             >
               {m.name[0]}
             </div>

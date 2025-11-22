@@ -31,7 +31,7 @@ export default function UploadOverlay({
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-[9999] flex justify-end w-full px-4 pointer-events-none sm:bottom-6 sm:right-6">
+    <div className="fixed bottom-4 right-4 z-999 flex justify-end w-full px-4 pointer-events-none sm:bottom-6 sm:right-6">
       <div className="pointer-events-auto bg-[#0d0d0f]/95 backdrop-blur-2xl border border-yellow-500/30 shadow-2xl rounded-xl p-5 w-full max-w-[380px] text-white animate-fadeIn">
 
         {/* header */}
@@ -82,7 +82,7 @@ export default function UploadOverlay({
         {/* progress bar */}
         <div className="w-full h-2 bg-neutral-800 rounded-full overflow-hidden border border-yellow-500/20">
           <div
-            className="h-full bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-500 transition-all duration-300"
+            className="h-full bg-linear-to-r from-yellow-300 via-yellow-400 to-yellow-500 transition-all duration-300"
             style={{ width: `${progress}%` }}
           ></div>
         </div>
