@@ -8,4 +8,4 @@ export function PdfViewer({ fileUrl }: { fileUrl: string }) {
       title="PDF Viewer"
     />
   );
-}
+} 
