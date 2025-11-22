@@ -25,6 +25,7 @@ export function useCloudinaryUpload() {
       apiKey: string;
       cloudName: string;
       folder: string;
+      resource_type: string;
     }
   ) => {
     abortCtrl.current = new AbortController();
@@ -43,9 +44,14 @@ export function useCloudinaryUpload() {
 
       const start = Date.now();
       let lastLoaded = 0;
+      const endpoint =
+        signatureData.resource_type === "raw"
+          ? `https://api.cloudinary.com/v1_1/${signatureData.cloudName}/raw/upload`   // <-- PDF upload
+          : `https://api.cloudinary.com/v1_1/${signatureData.cloudName}/image/upload`; // <-- Images/Thumbnails
 
-      const res = await axios.post(
-        `https://api.cloudinary.com/v1_1/${signatureData.cloudName}/auto/upload`,
+
+
+      const res = await axios.post(endpoint,
         formData,
         {
           signal: abortCtrl.current.signal,

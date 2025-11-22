@@ -24,12 +24,15 @@ export default function UploadNotePage() {
   };
 
   // upload a file
-  const uploadFile = async (file: File, folder: string) => {
+  const uploadFile = async (file: File, folder: string, type: "image" | "raw" = "image") => {
     setCurrentFile(file.name);                          // update current file
     setQueue((q) => q.filter((f) => f !== file.name));  // remove from queue
 
     const token = await getSigned(folder);
-    return await cloud.upload(file, token);
+    return await cloud.upload(file, {
+      ...token,
+      resource_type: type
+    });
   };
 
   // upload a group in parallel
@@ -39,75 +42,75 @@ export default function UploadNotePage() {
   };
 
   // main upload handler
-const handleUpload = useCallback(
-  async (title: string, desc: string, thumb: File | null, images: File[], pdfs: File[]) => {
-    try {
-      /* ---------------- VALIDATION ---------------- */
+  const handleUpload = useCallback(
+    async (title: string, desc: string, thumb: File | null, images: File[], pdfs: File[]) => {
+      try {
+        /* ---------------- VALIDATION ---------------- */
 
-      // Thumbnail is required
-      if (!thumb) {
-        alert("Thumbnail is required.");
-        return;
+        // Thumbnail is required
+        if (!thumb) {
+          alert("Thumbnail is required.");
+          return;
+        }
+
+        // Image limit
+        if (images.length > 10) {
+          alert("You can upload a maximum of 10 images.");
+          return;
+        }
+
+        // PDF limit
+        if (pdfs.length > 2) {
+          alert("You can upload a maximum of 2 PDFs.");
+          return;
+        }
+
+        // Ensure images are under 5MB
+        const tooBigImages = images.filter((f) => f.size > 5 * 1024 * 1024);
+        if (tooBigImages.length > 0) {
+          alert("Some images are still over 5MB after compression.");
+          return;
+        }
+
+        // Ensure PDFs are under 20MB
+        const tooBigPdf = pdfs.filter((f) => f.size > 20 * 1024 * 1024);
+        if (tooBigPdf.length > 0) {
+          alert("PDFs must be under 20MB. Compression may have failed.");
+          return;
+        }
+
+        /* ---------------- UPLOAD ---------------- */
+
+        // Upload thumbnail
+        const thumbnail = thumb ? await uploadFile(thumb, "noteThumb") : null;
+
+        // Upload images
+        const uploadedImages = images.length
+          ? await uploadBatch(images, "noteImages")
+          : [];
+
+        // Upload PDFs
+        const uploadedPdfs = pdfs.length
+          ? await Promise.all(pdfs.map(f => uploadFile(f, "notePdfs", "raw"))) // <-- PDF as raw upload
+          : [];
+
+        /* ---------------- SAVE TO BACKEND ---------------- */
+
+        await uploadNote({
+          title,
+          descriptions: desc,
+          thumbnail,
+          noteImages: uploadedImages,
+          notePdfs: uploadedPdfs,
+        });
+
+      } catch (err) {
+        console.error("❌ Upload failed:", err);
+        alert("Something went wrong while uploading!");
       }
-
-      // Image limit
-      if (images.length > 10) {
-        alert("You can upload a maximum of 10 images.");
-        return;
-      }
-
-      // PDF limit
-      if (pdfs.length > 2) {
-        alert("You can upload a maximum of 2 PDFs.");
-        return;
-      }
-
-      // Ensure images are under 5MB
-      const tooBigImages = images.filter((f) => f.size > 5 * 1024 * 1024);
-      if (tooBigImages.length > 0) {
-        alert("Some images are still over 5MB after compression.");
-        return;
-      }
-
-      // Ensure PDFs are under 20MB
-      const tooBigPdf = pdfs.filter((f) => f.size > 20 * 1024 * 1024);
-      if (tooBigPdf.length > 0) {
-        alert("PDFs must be under 20MB. Compression may have failed.");
-        return;
-      }
-
-      /* ---------------- UPLOAD ---------------- */
-
-      // Upload thumbnail
-      const thumbnail = thumb ? await uploadFile(thumb, "noteThumb") : null;
-
-      // Upload images
-      const uploadedImages = images.length
-        ? await uploadBatch(images, "noteImages")
-        : [];
-
-      // Upload PDFs
-      const uploadedPdfs = pdfs.length
-        ? await uploadBatch(pdfs, "notePdfs")
-        : [];
-
-      /* ---------------- SAVE TO BACKEND ---------------- */
-
-      await uploadNote({
-        title,
-        descriptions: desc,
-        thumbnail,
-        noteImages: uploadedImages,
-        notePdfs: uploadedPdfs,
-      });
-
-    } catch (err) {
-      console.error("❌ Upload failed:", err);
-      alert("Something went wrong while uploading!");
-    }
-  },
-  [ uploadNote]
-);
+    },
+    [uploadNote]
+  );
 
   const note = saved?.data;
 
@@ -152,7 +155,7 @@ const handleUpload = useCallback(
               isSaved={isSaved}
             />
           </div>
-          <UploadNoteDocs/>
+          <UploadNoteDocs />
         </section>
       </main>
     </>
