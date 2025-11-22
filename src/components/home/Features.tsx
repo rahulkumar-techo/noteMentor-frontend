@@ -7,14 +7,27 @@ export function Features() {
   ];
 
   return (
-    <section id="features" className="py-12">
-      <h3 className="text-2xl font-bold">Product features</h3>
-      <p className="mt-2 text-gray-600 dark:text-gray-400">Built for Indian classrooms.</p>
+    <section id="features" className="py-16  transition-colors">
+      <h3 className="text-3xl font-bold text-gray-900 dark:text-white">
+        Product features
+      </h3>
+      <p className="mt-2 text-gray-600 dark:text-gray-400">
+        Built for Indian classrooms.
+      </p>
 
-      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {items.map((it) => (
-          <div key={it.title} className="rounded-lg border dark:border-neutral-700 bg-white dark:bg-neutral-900 p-5 shadow-sm">
-            <h4 className="font-semibold">{it.title}</h4>
+          <div
+            key={it.title}
+            className="
+              rounded-xl p-6 
+              bg-white dark:bg-neutral-800 
+              border border-gray-200 dark:border-neutral-700
+              shadow-sm hover:shadow-md hover:border-indigo-500 dark:hover:border-indigo-400
+              transition-all
+            "
+          >
+            <h4 className="font-semibold text-gray-900 dark:text-white">{it.title}</h4>
             <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">{it.desc}</p>
           </div>
         ))}

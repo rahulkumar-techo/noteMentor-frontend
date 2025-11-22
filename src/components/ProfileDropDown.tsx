@@ -82,7 +82,7 @@ export default function ProfileDropdown({ user }: { user?: UserInfo }) {
       <DropdownMenuContent
         align="end"
         sideOffset={8}
-        className="w-56 rounded-xl border border-white/10  bg-black backdrop-blur-md shadow-lg text-sm"
+        className="w-56 rounded-xl border border-white/10  dark:bg-black backdrop-blur-md shadow-lg text-sm"
       >
         {/* 🧠 User Info */}
         <div className="px-4 py-3 border-b border-white/10">

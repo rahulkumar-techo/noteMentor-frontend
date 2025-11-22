@@ -1,14 +1,6 @@
 "use client";
 
-/**
- * 🔐 LogoutAction Component
- * ------------------------------------------------------
- * - Handles user logout with full UI feedback.
- * - Works as a <Button>, menu item, or icon button.
- * - Triggers /logout endpoint via RTK Query mutation.
- * - Clears cookies (server-side) and redirects to /login.
- * - Uses toast notifications for smooth UX.
- */
+/* Short comments • clean structure */
 
 import React from "react";
 import { Button } from "@/components/ui/button";
@@ -34,28 +26,38 @@ export default function LogoutAction({
   const [logoutUser, { isLoading }] = useLogoutMutation();
   const router = useRouter();
 
+  // logout core
   const handleLogout = async () => {
+    const toastId = toast.loading("Logging out...");
     try {
-      // 🧠 Loading indicator
-      const toastId = toast.loading("Logging out...");
+      const res = await logoutUser(undefined).unwrap();
 
-      // ✅ Always CALL the mutation (not reference it)
-      const response = await logoutUser(undefined).unwrap();
-
-      toast.dismiss(toastId);
-      toast.success(response?.message || "Logged out successfully 👋");
-
-      // 🔄 Optional callback and redirect
+      toast.success(res?.message || "Logged out");
       onAfterLogout?.();
       router.push("/login");
-    } catch (err: any) {
-      console.error("Logout error:", err);
-      toast.dismiss();
-      toast.error("Logout failed. Please try again.");
+    } catch {
+      toast.error("Logout failed");
+    } finally {
+      toast.dismiss(toastId);
     }
   };
 
-  // 🧩 Variant: Full Button
+  // reusable loading icon/text
+  const LoadingIcon = (
+    <>
+      <Loader2 className="w-4 h-4 animate-spin" />
+      Logging out...
+    </>
+  );
+
+  const NormalIcon = (
+    <>
+      <LogOut className="w-4 h-4" />
+      {label}
+    </>
+  );
+
+  /* Variant: full button */
   if (variant === "button") {
     return (
       <Button
@@ -64,28 +66,18 @@ export default function LogoutAction({
         variant="outline"
         className={`flex items-center gap-2 ${className}`}
       >
-        {isLoading ? (
-          <>
-            <Loader2 className="w-4 h-4 animate-spin" />
-            Logging out...
-          </>
-        ) : (
-          <>
-            <LogOut className="w-4 h-4" />
-            {label}
-          </>
-        )}
+        {isLoading ? LoadingIcon : NormalIcon}
       </Button>
     );
   }
 
-  // 🧩 Variant: Icon Only
+  /* Variant: Icon-only */
   if (variant === "icon") {
     return (
       <button
         onClick={handleLogout}
         disabled={isLoading}
-        className={`flex items-center justify-center rounded-full p-2 hover:bg-white/10 transition-colors ${className}`}
+        className={`p-2 rounded-full hover:bg-white/10 transition-colors ${className}`}
         title="Logout"
       >
         {isLoading ? (
@@ -97,7 +89,7 @@ export default function LogoutAction({
     );
   }
 
-  // 🧩 Default Variant: Dropdown Menu Item
+  /* Default: Dropdown menu item */
   return (
     <DropdownMenuItem
       disabled={isLoading}
@@ -105,18 +97,9 @@ export default function LogoutAction({
         e.preventDefault();
         handleLogout();
       }}
-      className={`text-red-500 focus:text-red-600 font-medium cursor-pointer flex items-center gap-2 ${className}`}
+      className={`text-red-500 font-medium cursor-pointer flex items-center gap-2 ${className}`}
     >
-      {isLoading ? (
-        <>
-          <Loader2 className="animate-spin w-4 h-4" /> Logging out...
-        </>
-      ) : (
-        <>
-          <LogOut className="w-4 h-4" />
-          {label}
-        </>
-      )}
+      {isLoading ? LoadingIcon : NormalIcon}
     </DropdownMenuItem>
   );
 }

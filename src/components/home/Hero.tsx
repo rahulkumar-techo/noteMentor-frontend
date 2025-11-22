@@ -4,7 +4,7 @@ import Image from "next/image";
 
 export default function Hero() {
   return (
-    <section className="pt-16 pb-20">
+    <section className="pt-16 pb-20  text-black dark:text-gray-300">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
         
         {/* ----- Left Content ----- */}
@@ -13,7 +13,7 @@ export default function Hero() {
             Turn messy notebooks into exam-ready study guides.
           </h2>
 
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-xl">
+          <p className="text-lg text-black dark:text-gray-300 max-w-xl">
             NoteMentor processes handwritten + regional notes into clean summaries, 
             quizzes, and exam-ready materials automatically.
           </p>

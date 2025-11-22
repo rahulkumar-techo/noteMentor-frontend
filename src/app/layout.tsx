@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={` antialiased bg-black text-white`}
+        className={` antialiased dark:bg-black text-white`}
       >
           <ClientProvider>
             <div className="flex h-screen w-full">

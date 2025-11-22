@@ -3,88 +3,92 @@ import api from "../mainApi";
 export const noteApi = api.injectEndpoints({
   endpoints: (builder) => ({
 
-    // create note
     uploadNote: builder.mutation<any, Record<string, any>>({
       query: (data) => ({
         url: "/note/upload",
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["Note"],
+      invalidatesTags: [{ type: "Note", id: "LIST" }],
     }),
 
-    // update note
-    updateNote: builder.mutation<
-      any,
-      { noteId: string; formData: Record<string, any> }
-    >({
+    updateNote: builder.mutation<any, { noteId: string; formData: any }>({
       query: ({ noteId, formData }) => ({
         url: `/note/update/${noteId}`,
         method: "PUT",
         body: formData,
       }),
-      invalidatesTags: (result, error, { noteId }) => [
+      invalidatesTags: (res, err, { noteId }) => [
         { type: "Note", id: noteId },
+        { type: "Note", id: "LIST" },
       ],
     }),
 
-
-    // delete selected files
-    deleteNoteFiles: builder.mutation<
-      any,
-      { noteId: string; noteImageIds?: string[]; notePdfIds?: string[]; thumbId?: string }
-    >({
+    deleteNoteFiles: builder.mutation<any, { noteId: string; noteImageIds?: string[]; notePdfIds?: string[]; thumbId?: string }>({
       query: (data) => ({
         url: "/note/delete-files",
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["Note"],
+      invalidatesTags: (res, err, { noteId }) => [
+        { type: "Note", id: noteId },
+        { type: "Note", id: "LIST" },
+      ],
     }),
 
-    // delete note
     deleteNote: builder.mutation<any, { noteId: string }>({
       query: ({ noteId }) => ({
         url: `/note/delete/${noteId}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Note"],
+      invalidatesTags: (res, err, { noteId }) => [
+        { type: "Note", id: noteId },
+        { type: "Note", id: "LIST" },
+      ],
     }),
 
-    // list notes
     getNotes: builder.query<any, void>({
       query: () => "/note/list",
-      providesTags: ["Note"],
+      providesTags: [{ type: "Note", id: "LIST" }],
     }),
 
-    // get note by id
     getNoteById: builder.query<any, string>({
       query: (id) => `/note/${id}`,
       providesTags: (r, e, id) => [{ type: "Note", id }],
     }),
 
-    // update settings
     updateNoteSettings: builder.mutation<any, { id: string; settings: any }>({
       query: ({ id, settings }) => ({
         url: `/note/settings/${id}`,
         method: "PATCH",
         body: settings,
       }),
-      invalidatesTags: (r, e, { id }) => [{ type: "Note", id }],
+      invalidatesTags: (r, e, { id }) => [
+        { type: "Note", id },
+        { type: "Note", id: "LIST" },
+      ],
     }),
+
     updateViews: builder.mutation<any, { id: string }>({
       query: ({ id }) => ({
         url: `/note/${id}/view`,
         method: "PATCH",
       }),
-      invalidatesTags: (r, e, { id }) => [{ type: "Note", id }],
+      invalidatesTags: (r, e, { id }) => [
+        { type: "Note", id },
+        { type: "Note", id: "LIST" },
+      ],
     }),
-    toggleLikes: builder.mutation<any, { id: string}>({
+
+    toggleLikes: builder.mutation<any, { id: string }>({
       query: ({ id }) => ({
         url: `/note/${id}/like`,
         method: "PATCH",
       }),
-      invalidatesTags: (r, e, { id }) => [{ type: "Note", id }],
+      invalidatesTags: (r, e, { id }) => [
+        { type: "Note", id },
+        { type: "Note", id: "LIST" },
+      ],
     }),
 
   }),
@@ -92,7 +96,6 @@ export const noteApi = api.injectEndpoints({
   overrideExisting: true,
 });
 
-// hooks
 export const {
   useUploadNoteMutation,
   useUpdateNoteMutation,
@@ -101,9 +104,8 @@ export const {
   useGetNotesQuery,
   useGetNoteByIdQuery,
   useUpdateNoteSettingsMutation,
-  // reactions
   useToggleLikesMutation,
-  useUpdateViewsMutation
+  useUpdateViewsMutation,
 } = noteApi;
 
 export default noteApi;

@@ -15,6 +15,8 @@ export function useAuthGuard() {
     "/upload-notes",
   ];
 
+  const publicRoutes = ["/login", "/register", "/forgot-password"];
+
   const { data, isLoading, isError } = useGetUserQuery(undefined, {
     refetchOnMountOrArgChange: true,
     refetchOnFocus: false,
@@ -26,24 +28,27 @@ export function useAuthGuard() {
   useEffect(() => {
     if (isLoading) return;
 
-    // 🔒 If user NOT logged in → redirect to login
+    // ⭐ Skip guard for public pages
+    if (publicRoutes.includes(pathname)) return;
+
+    // 🔒 Not logged in → go login
     if (isError || !user) {
       router.replace("/login");
       return;
     }
 
-    // ❌ If user is COMPLETE but tries to visit /complete-profile → block it
-    if (user.isProfileComplete === true && pathname === "/complete-profile") {
+    // ❌ Profile completed → block /complete-profile
+    if (user.isProfileComplete && pathname === "/complete-profile") {
       router.replace("/dashboard");
       return;
     }
 
-    // 🔒 If route is protected AND profile NOT complete → redirect
+    // 🔒 Protected route but profile not complete
     const isProtected = protectedRoutes.some((route) =>
       pathname.startsWith(route)
     );
 
-    if (isProtected && user.isProfileComplete === false) {
+    if (isProtected && !user.isProfileComplete) {
       router.replace("/complete-profile");
       return;
     }

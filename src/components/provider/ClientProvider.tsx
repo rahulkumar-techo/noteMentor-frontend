@@ -20,9 +20,7 @@ export default function ClientProvider({ children }: { children: React.ReactNode
         {/* Navbar decides internally whether to hide on certain routes */}
         <Navbar />
         <Toaster />
-       <ProtectedPage>
-         {children}
-       </ProtectedPage>
+        {children}
       </Provider>
     </ThemeProvider>
   );
