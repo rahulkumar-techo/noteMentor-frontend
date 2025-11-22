@@ -1,4 +1,10 @@
 "use client";
+/* 
+  Upload Note Page 
+  - Handles signed uploads (image/pdf)
+  - Tracks queue + progress overlay
+  - Saves final note to backend
+*/
 
 import { useCallback, useState } from "react";
 import NoteUploadForm from "./(components)/NoteUploadForm";
@@ -10,92 +16,75 @@ import UploadNoteDocs from "./(components)/UploadNoteDocs";
 
 export default function UploadNotePage() {
   const cloud = useCloudinaryUpload();
-  const [uploadNote, { isLoading: saving, data: saved, isSuccess: isSaved }] = useUploadNoteMutation();
 
-  // NEW: current file + queue
-  const [currentFile, setCurrentFile] = useState<string>("");
+  const [uploadNote, { isLoading: saving, data: saved, isSuccess: isSaved }] =
+    useUploadNoteMutation();
+
+  const [currentFile, setCurrentFile] = useState("");
   const [queue, setQueue] = useState<string[]>([]);
 
-
-  // signed token
+  /* ---------------- GET SIGNED DETAILS ---------------- */
   const getSigned = async (folder: string) => {
     const res = await axiosInstance.get(`/note/signed-upload?folder=${folder}`);
     return res.data.data;
   };
 
-  // upload a file
-  const uploadFile = async (file: File, folder: string, type: "image" | "raw" = "image") => {
-    setCurrentFile(file.name);                          // update current file
-    setQueue((q) => q.filter((f) => f !== file.name));  // remove from queue
+  /* ---------------- SINGLE FILE UPLOAD ---------------- */
+  const uploadFile = async (
+    file: File,
+    folder: string,
+    type: "image" | "raw" = "image"
+  ) => {
+    setCurrentFile(file.name);
+    setQueue((q) => q.filter((f) => f !== file.name));
 
     const token = await getSigned(folder);
-    return await cloud.upload(file, {
-      ...token,
-      resource_type: type
-    });
+
+    // pass resource_type for PDF
+    return cloud.upload(file, { ...token, resource_type: type });
   };
 
-  // upload a group in parallel
+  /* ---------------- MULTIPLE FILE UPLOAD ---------------- */
   const uploadBatch = async (files: File[], folder: string) => {
-    setQueue(files.map((f) => f.name));                 // set queue before upload
+    setQueue(files.map((f) => f.name));
     return Promise.all(files.map((f) => uploadFile(f, folder)));
   };
 
-  // main upload handler
+  /* ---------------- MAIN UPLOAD HANDLER ---------------- */
   const handleUpload = useCallback(
-    async (title: string, desc: string, thumb: File | null, images: File[], pdfs: File[]) => {
+    async (
+      title: string,
+      desc: string,
+      thumb: File | null,
+      images: File[],
+      pdfs: File[]
+    ) => {
       try {
-        /* ---------------- VALIDATION ---------------- */
+        // validation
+        if (!thumb) return alert("Thumbnail is required.");
+        if (images.length > 10) return alert("Max 10 images allowed.");
+        if (pdfs.length > 2) return alert("Max 2 PDFs allowed.");
 
-        // Thumbnail is required
-        if (!thumb) {
-          alert("Thumbnail is required.");
-          return;
-        }
+        if (images.some((i) => i.size > 5 * 1024 * 1024))
+          return alert("Images must be under 5MB.");
 
-        // Image limit
-        if (images.length > 10) {
-          alert("You can upload a maximum of 10 images.");
-          return;
-        }
+        if (pdfs.some((p) => p.size > 20 * 1024 * 1024))
+          return alert("PDF must be under 20MB.");
 
-        // PDF limit
-        if (pdfs.length > 2) {
-          alert("You can upload a maximum of 2 PDFs.");
-          return;
-        }
+        // upload files
+        const thumbnail = await uploadFile(thumb, "noteThumb");
 
-        // Ensure images are under 5MB
-        const tooBigImages = images.filter((f) => f.size > 5 * 1024 * 1024);
-        if (tooBigImages.length > 0) {
-          alert("Some images are still over 5MB after compression.");
-          return;
-        }
-
-        // Ensure PDFs are under 20MB
-        const tooBigPdf = pdfs.filter((f) => f.size > 20 * 1024 * 1024);
-        if (tooBigPdf.length > 0) {
-          alert("PDFs must be under 20MB. Compression may have failed.");
-          return;
-        }
-
-        /* ---------------- UPLOAD ---------------- */
-
-        // Upload thumbnail
-        const thumbnail = thumb ? await uploadFile(thumb, "noteThumb") : null;
-
-        // Upload images
         const uploadedImages = images.length
           ? await uploadBatch(images, "noteImages")
           : [];
 
-        // Upload PDFs
         const uploadedPdfs = pdfs.length
-          ? await Promise.all(pdfs.map(f => uploadFile(f, "notePdfs", "raw"))) // <-- PDF as raw upload
+          ? await Promise.all(
+              pdfs.map((f) => uploadFile(f, "notePdfs", "raw")) // raw upload
+            )
           : [];
 
-        /* ---------------- SAVE TO BACKEND ---------------- */
-
+        // save note
         await uploadNote({
           title,
           descriptions: desc,
@@ -103,7 +92,6 @@ export default function UploadNotePage() {
           noteImages: uploadedImages,
           notePdfs: uploadedPdfs,
         });
-
       } catch (err) {
         console.error("❌ Upload failed:", err);
         alert("Something went wrong while uploading!");
@@ -112,11 +100,9 @@ export default function UploadNotePage() {
     [uploadNote]
   );
 
-  const note = saved?.data;
-
   return (
     <>
-      {/* overlay */}
+      {/* Overlay */}
       {cloud.loading && (
         <UploadOverlay
           progress={cloud.progress}
@@ -129,15 +115,18 @@ export default function UploadNotePage() {
         />
       )}
 
-      {/* UI */}
-      <main className="min-h-screen flex items-center justify-center bg-white dark:bg-black text-black  dark:text-white px-6 mt-0">
-        <section className="w-full max-w-5xl   pb-16 space-y-10">
-
+      {/* Main UI */}
+      <main className="min-h-screen flex items-center justify-center bg-white dark:bg-black text-black dark:text-white px-6">
+        <section className="w-full max-w-5xl pb-16 space-y-10">
           {/* Header */}
           <div className="text-center space-y-2">
-            <h1 className="text-3xl md:text-4xl font-semibold text-[#FFD700]">Upload Your Notes</h1>
-            <p className="text-sm text-gray-400">Upload images, PDFs, and a thumbnail.</p>
-            {/* Back Button */}
+            <h1 className="text-3xl md:text-4xl font-semibold text-[#FFD700]">
+              Upload Your Notes
+            </h1>
+            <p className="text-sm text-gray-400">
+              Upload images, PDFs, and a thumbnail.
+            </p>
+
             <button
               onClick={() => window.history.back()}
               className="flex items-center gap-2 text-sm text-blue-600 hover:underline"
@@ -147,7 +136,7 @@ export default function UploadNotePage() {
           </div>
 
           {/* Form */}
-          <div className="flex flex-col items-center w-full  rounded-2xl shadow-xl p-6 backdrop-blur-xl">
+          <div className="flex flex-col items-center w-full rounded-2xl shadow-xl p-6 backdrop-blur-xl">
             <NoteUploadForm
               progressValue={cloud.progress}
               isUploading={saving}
@@ -155,6 +144,7 @@ export default function UploadNotePage() {
               isSaved={isSaved}
             />
           </div>
+
           <UploadNoteDocs />
         </section>
       </main>

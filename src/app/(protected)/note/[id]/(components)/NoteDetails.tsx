@@ -6,13 +6,14 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
-import { PdfViewer } from "./NotePdf";
+
 import CommentSystem from "@/components/comment-sys/CommentSystem";
 import CustomAvatar from "@/components/CustomAvatar";
 import { ThumbsUp, Eye } from "lucide-react";
 import LikeButton from "./LikeButton";
 import ViewCounter from "@/shared/utils/ViewsCounter";
 import ImagePreview from "@/components/PreviewImage";
+import { PdfViewer } from "./NotePdf";
 
 interface NoteDetailsProps {
     note: any;
@@ -29,7 +30,7 @@ export default function NoteDetails({ note, toggleLikes }: NoteDetailsProps) {
         note.likes.includes(note.currentUserId); // you can pass userId later if needed
 
     return (
-        <div className="max-w-4xl mx-auto p-4 space-y-8">
+        <div className="max-w-4xl mx-auto md:p-4 space-y-8">
 
             {/* Back Button */}
             <button
