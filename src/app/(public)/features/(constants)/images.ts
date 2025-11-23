@@ -35,4 +35,12 @@ export const IMAGES = {
 
   mobileFirst:
     "https://images.unsplash.com/photo-1603899122625-c26fdbf6b2f0?auto=format&fit=crop&w=850&q=80",
+  feed:
+    "../../../../feed.png",
+  mobileResponsive:
+    "../../../../mobile-responsive",
+  dashboard:
+    "../../../../dashboard.png",
+  uploadNotes:
+    "../../../../feed.png",
 };

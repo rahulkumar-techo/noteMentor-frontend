@@ -1,3 +1,4 @@
+import { dashboard, mobileRes } from "@/assets";
 import { IMAGES } from "./images";
 
 export const FEATURE_SECTIONS = [
@@ -59,22 +60,9 @@ export const FEATURE_SECTIONS = [
       "Time-based study insights",
       "Progress heatmaps",
     ],
-    image: IMAGES.analytics,
+    image:dashboard,
   },
 
-  {
-    id: "real-time-collaboration",
-    title: "Real-Time Collaboration",
-    description:
-      "Study together with classmates or collaborate in groups — live, in real time.",
-    points: [
-      "Shared note editing",
-      "Live chat & reactions",
-      "Collaborator activity view",
-      "Team-based study rooms",
-    ],
-    image: IMAGES.collaboration,
-  },
 
   {
     id: "cloud-sync",
@@ -91,20 +79,6 @@ export const FEATURE_SECTIONS = [
   },
 
   {
-    id: "personalization",
-    title: "AI-Personalized Learning",
-    description:
-      "Enjoy a smarter study workflow that adapts to your pace, memory, and weaknesses.",
-    points: [
-      "AI study plans for each subject",
-      "Difficulty adaptation",
-      "Smart reminders",
-      "Recommended quizzes & notes",
-    ],
-    image: IMAGES.personalization,
-  },
-
-  {
     id: "mobile-first",
     title: "Optimized for Mobile",
     description:
@@ -115,6 +89,6 @@ export const FEATURE_SECTIONS = [
       "Touch-optimized UI",
       "Battery-efficient design",
     ],
-    image: IMAGES.mobileFirst,
+    image: mobileRes,
   },
 ];

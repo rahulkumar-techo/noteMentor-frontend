@@ -3,14 +3,12 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/settings/theme-provider";
 import ClientProvider from "@/components/provider/ClientProvider";
+import { app_metadata } from "@/SEO/app-metadata";
 
 
 
 
-export const metadata: Metadata = {
-  title: "NoteMentor Dashboard",
-  description: "Learn smarter with NoteMentor",
-};
+export const metadata: Metadata =app_metadata;
 
 export default function RootLayout({
   children,
