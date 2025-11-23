@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -11,8 +12,7 @@ export default function NoteCard({ item }: { item: any }) {
   const subjects = p.subjects || [];
   const subjectLabel = subjects.length > 0 ? subjects.join(", ") : "General";
 
-  console.log(p)
-
+console.log({p:p.authorId.avatar.secure_url})
   return (
     <article
       className="
@@ -31,9 +31,9 @@ export default function NoteCard({ item }: { item: any }) {
             flex items-center justify-center text-sm font-medium
             text-neutral-700 dark:text-neutral-300
           ">
-            {p.author?.avatar ? (
+            {p.authorId.avatar.secure_url ? (
               <Image
-                src={p.author.avatar}
+                src={p.authorId.avatar.secure_url}
                 alt="avatar"
                 width={40}
                 height={40}
@@ -46,11 +46,9 @@ export default function NoteCard({ item }: { item: any }) {
 
           <div>
             <p className="font-medium text-sm text-gray-900 dark:text-white">
-              {p.author?.name ?? "Unknown User"}
+              {p.authorId?.fullname ?? "Unknown User"}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              {subjectLabel}
-            </p>
+            <Badge className="truncate bg-yellow-600" >{subjectLabel}</Badge>
           </div>
         </div>
 
