@@ -8,12 +8,10 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ScrollArea } from "@/components/ui/scroll-area"
 import ClientProvider from "@/components/provider/ClientProvider";
+import { dashboard_metaData } from "@/SEO/app-metadata";
 
 
-export const metadata: Metadata = {
-  title: "NoteMentor Dashboard",
-  description: "Learn smarter with NoteMentor",
-};
+export const metadata: Metadata = dashboard_metaData;
 
 export default function DashboardLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
